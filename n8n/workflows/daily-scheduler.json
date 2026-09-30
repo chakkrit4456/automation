@@ -1,0 +1,41 @@
+{
+  "id": "aiSocialDaily001",
+  "name": "Daily scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 9 * * *" }]
+        }
+      },
+      "id": "2f0f3a52-1c7e-4b8e-9a3e-6a0c1d9e0001",
+      "name": "09:00 Asia/Bangkok",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:3000/api/automation/run-now",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "x-automation-token", "value": "={{ $env.AUTOMATION_TOKEN }}" }]
+        },
+        "options": { "timeout": 900000 }
+      },
+      "id": "2f0f3a52-1c7e-4b8e-9a3e-6a0c1d9e0002",
+      "name": "Run automation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 300]
+    }
+  ],
+  "connections": {
+    "09:00 Asia/Bangkok": {
+      "main": [[{ "node": "Run automation", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "timezone": "Asia/Bangkok", "executionOrder": "v1" },
+  "active": false
+}

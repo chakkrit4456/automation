@@ -1,0 +1,16 @@
+{
+  "name": "ai-social-automation-backend",
+  "private": true,
+  "scripts": {
+    "start": "node --env-file-if-exists=../.env server.js",
+    "dev": "node --env-file-if-exists=../.env server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0",
+    "pg": "^8.16.3"
+  },
+  "engines": {
+    "node": ">=22.9"
+  }
+}

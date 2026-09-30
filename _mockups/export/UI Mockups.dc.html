@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/industry-ac968ea4-010d-4eb5-baf1-f6a14a860d06/styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600&display=swap">
+<script src="_ds/industry-ac968ea4-010d-4eb5-baf1-f6a14a860d06/_ds_bundle.js"></script>
+<style>:root{--font-heading:'Barlow Condensed','Noto Sans Thai',sans-serif;--font-body:'Barlow','Noto Sans Thai',sans-serif}body{margin:0;background:var(--color-neutral-100);font-family:var(--font-body);color:var(--color-text)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-900)}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid var(--color-divider)}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 11px ui-monospace,monospace;padding:3px 7px;background:var(--color-text);color:var(--color-bg);text-decoration:none}.dv-tname{font:600 22px/1.2 var(--font-heading)}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px}.dv-oid{font:600 11px ui-monospace,monospace;padding:3px 7px;background:var(--color-neutral-200);color:var(--color-text);text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--color-neutral-700)}.dv-card{background:var(--color-bg);border:1px solid var(--color-divider);box-shadow:var(--shadow-sm);overflow:hidden}.dv-next{margin:22px 0 0;font-size:13px;color:var(--color-neutral-700)}</style>
+</helmet>
+
+<section class="dv-turn" id="t0">
+<div class="dv-thd"><span class="dv-tid">00</span><span class="dv-tname">แนวทาง</span></div>
+<div style="max-width:760px;font-size:14px;line-height:1.7;display:flex;flex-direction:column;gap:8px">
+<p style="margin:0">11 หน้าจอตาม docs/02-ui.md หน้าจอละ 2 แบบ ทั้งเดสก์ท็อป (1180×740) และมือถือ (360×720) ใช้ระบบดีไซน์ Industry</p>
+<p style="margin:0"><b>แบบ A</b> เมนูด้านข้าง เน้นตารางและข้อมูลแน่น เหมาะกับงานปฏิบัติการประจำวัน บนมือถือใช้แถบแท็บด้านล่าง</p>
+<p style="margin:0"><b>แบบ B</b> เมนูด้านบน จัดเป็นช่องกริดใหญ่แบบพิมพ์เขียว ตัวเลขเด่น บนมือถือใช้เมนูแฮมเบอร์เกอร์และการ์ดซ้อน</p>
+<p style="margin:0;color:var(--color-neutral-700)">รูปภาพ/วิดีโอเป็นตัวแทน (placeholder) ข้อมูลเป็นตัวอย่าง สถิติแสดงเฉพาะค่าที่ API แพลตฟอร์มให้มาจริง</p>
+</div>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><span class="dv-tid">01</span><span class="dv-tname">แดชบอร์ด</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>เดสก์ท็อป · เมนูข้าง</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+<div style="margin-top:auto;padding:8px;font-size:11px;color:var(--color-neutral-700);display:flex;gap:6px;align-items:center"><span style="width:7px;height:7px;background:var(--color-accent)"></span>ระบบปกติ · Asia/Bangkok</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:18px;min-width:0">
+<div style="display:flex;align-items:center;gap:12px"><h1 style="margin:0;font-size:28px">วันนี้ · พ. 30 ก.ย. 2569</h1><span style="flex:1"></span><button class="btn btn-secondary">ดูปฏิทิน</button><button class="btn btn-primary">+ สร้างคอนเทนต์</button></div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">วิดีโอวันนี้</span><span style="font:600 34px var(--font-heading)">1</span></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">ตั้งเวลาแล้ว</span><span style="font:600 34px var(--font-heading)">6</span></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">เผยแพร่แล้ว</span><span style="font:600 34px var(--font-heading)">42</span></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">ล้มเหลว</span><span style="font:600 34px var(--font-heading)">1</span></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">บัญชีที่เชื่อม</span><span style="font:600 34px var(--font-heading)">3/4</span></div>
+</div>
+<div style="display:grid;grid-template-columns:260px 1fr 1fr;gap:12px;flex:1;min-height:0">
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">โพสต์ถัดไป · 09:00</span><div style="aspect-ratio:9/16;max-height:300px;background:var(--color-accent-100);display:grid;place-items:center;font-size:11px;color:var(--color-accent-800)">ตัวอย่างวิดีโอ 9:16</div><span class="card-title">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</span><div style="display:flex;gap:4px;flex-wrap:wrap"><span class="tag tag-accent">TikTok</span><span class="tag tag-accent">IG</span><span class="tag tag-accent">FB</span><span class="tag tag-accent">YT</span></div></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">สถานะรายแพลตฟอร์ม</span>
+<table class="table"><tbody><tr><td>TikTok</td><td><span class="tag tag-accent">เชื่อมต่อ</span></td><td style="font-size:12px">โพสต์ล่าสุด 08:59</td></tr><tr><td>Instagram</td><td><span class="tag tag-accent">เชื่อมต่อ</span></td><td style="font-size:12px">09:01</td></tr><tr><td>Facebook</td><td><span class="tag tag-outline">โทเคนหมดอายุ</span></td><td style="font-size:12px">เมื่อวาน</td></tr><tr><td>YouTube</td><td><span class="tag tag-accent">เชื่อมต่อ</span></td><td style="font-size:12px">09:02</td></tr></tbody></table>
+<span class="card-kicker" style="margin-top:8px">ข้อผิดพลาดล่าสุด</span><div style="font-size:13px">#102 Facebook · OAuth token expired</div><div style="display:flex;gap:8px"><button class="btn btn-secondary">เชื่อมต่อใหม่</button><button class="btn btn-ghost">ลองอีกครั้ง</button></div></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">กิจกรรมล่าสุด</span>
+<div style="display:flex;flex-direction:column;gap:10px;font-size:13px"><div style="display:flex;gap:10px"><span style="color:var(--color-neutral-700);width:42px">09:02</span>เผยแพร่ #102 บน YouTube สำเร็จ</div><div style="display:flex;gap:10px"><span style="color:var(--color-neutral-700);width:42px">09:01</span>เผยแพร่ #102 บน Instagram สำเร็จ</div><div style="display:flex;gap:10px"><span style="color:var(--color-neutral-700);width:42px">08:59</span>เผยแพร่ #102 บน TikTok สำเร็จ</div><div style="display:flex;gap:10px"><span style="color:var(--color-neutral-700);width:42px">06:40</span>FFmpeg ประมวลผล #103 เสร็จ</div><div style="display:flex;gap:10px"><span style="color:var(--color-neutral-700);width:42px">06:12</span>Claude สร้างสคริปต์ #103</div><div style="display:flex;gap:10px"><span style="color:var(--color-neutral-700);width:42px">06:00</span>เริ่มงานประจำวัน</div></div></div>
+</div>
+</main>
+</div></div>
+
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>เดสก์ท็อป · เมนูบน กริดพิมพ์เขียว</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span>เพิ่มเติม ▾</span></header>
+<div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:auto 1fr 1fr;border-top:0">
+<div style="grid-column:1/3;padding:28px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div class="card-kicker">พ. 30 ก.ย. · 07:48</div><h1 style="margin:6px 0 0;font-size:44px;line-height:1">คิววันนี้พร้อมแล้ว</h1><p style="margin:8px 0 0;font-size:14px;color:var(--color-neutral-700)">โพสต์ถัดไป 09:00 · 4 แพลตฟอร์ม</p></div>
+<div style="padding:28px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div class="card-kicker">เผยแพร่แล้ว</div><div style="font:600 72px/1 var(--font-heading)">42</div></div>
+<div style="padding:28px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">ล้มเหลว</div><div style="font:600 72px/1 var(--font-heading);color:var(--color-accent-700)">01</div></div>
+<div style="grid-row:2/4;padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px"><div class="card-kicker">ตัวอย่างวันนี้</div><div class="blueprint" style="flex:1;background:var(--color-accent-100);display:grid;place-items:center;font-size:11px;color:var(--color-accent-800)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>วิดีโอ 9:16</div><div class="card-title">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</div></div>
+<div style="grid-column:2/4;padding:24px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);display:grid;grid-template-columns:repeat(4,1fr);gap:12px"><div class="card-kicker" style="grid-column:1/-1">แพลตฟอร์ม</div><div><div style="font:600 22px var(--font-heading)">TikTok</div><span class="tag tag-accent">ปกติ</span></div><div><div style="font:600 22px var(--font-heading)">Instagram</div><span class="tag tag-accent">ปกติ</span></div><div><div style="font:600 22px var(--font-heading)">Facebook</div><span class="tag tag-outline">หมดอายุ</span></div><div><div style="font:600 22px var(--font-heading)">YouTube</div><span class="tag tag-accent">ปกติ</span></div></div>
+<div style="grid-row:2/4;grid-column:4;padding:24px;font-size:13px;display:flex;flex-direction:column;gap:10px"><div class="card-kicker">กิจกรรม</div><div>09:02 YouTube สำเร็จ</div><div>09:01 Instagram สำเร็จ</div><div>08:59 TikTok สำเร็จ</div><div>06:40 FFmpeg #103 เสร็จ</div><div>06:12 Claude สคริปต์ #103</div></div>
+<div style="grid-column:2/4;padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px"><div class="card-kicker">ต้องดำเนินการ</div><div style="font-size:15px">#102 Facebook — OAuth token expired</div><div style="display:flex;gap:8px"><button class="btn btn-primary">เชื่อมต่อใหม่</button><button class="btn btn-secondary">ลองอีกครั้ง</button></div></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">พ. 30 ก.ย.</div><div style="font:600 24px var(--font-heading)">แดชบอร์ด</div></div>
+<div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="card"><span class="card-kicker">ตั้งเวลา</span><b style="font:600 26px var(--font-heading)">6</b></div><div class="card"><span class="card-kicker">เผยแพร่</span><b style="font:600 26px var(--font-heading)">42</b></div><div class="card"><span class="card-kicker">ล้มเหลว</span><b style="font:600 26px var(--font-heading)">1</b></div><div class="card"><span class="card-kicker">บัญชี</span><b style="font:600 26px var(--font-heading)">3/4</b></div></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">ถัดไป 09:00</span><div style="display:flex;gap:10px"><div style="width:60px;height:96px;background:var(--color-accent-100);flex:none"></div><div style="font-size:14px">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</div></div></div>
+<div class="card"><span class="card-kicker">ข้อผิดพลาด</span><div style="font-size:13px">#102 Facebook · token หมดอายุ</div><button class="btn btn-secondary" style="min-height:44px">เชื่อมต่อใหม่</button></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="1d"><div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>มือถือ · แบบ B</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-size:20px">≡</span><b style="font:600 18px var(--font-heading)">SOCIAL / AUTO</b></div>
+<div style="padding:20px 16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">วันนี้</div><div style="font:600 34px/1 var(--font-heading)">คิวพร้อมแล้ว</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr"><div style="padding:16px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><div class="card-kicker">เผยแพร่</div><div style="font:600 48px/1 var(--font-heading)">42</div></div><div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">ล้มเหลว</div><div style="font:600 48px/1 var(--font-heading)">01</div></div></div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:8px;font-size:14px"><div class="card-kicker">แพลตฟอร์ม</div><div style="display:flex;justify-content:space-between">TikTok<span class="tag tag-accent">ปกติ</span></div><div style="display:flex;justify-content:space-between">Instagram<span class="tag tag-accent">ปกติ</span></div><div style="display:flex;justify-content:space-between">Facebook<span class="tag tag-outline">หมดอายุ</span></div><div style="display:flex;justify-content:space-between">YouTube<span class="tag tag-accent">ปกติ</span></div></div>
+<div style="margin-top:auto;padding:16px"><button class="btn btn-primary blueprint" style="width:100%;min-height:48px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>+ สร้างคอนเทนต์</button></div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><span class="dv-tid">02</span><span class="dv-tname">คอนเทนต์</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="2a"><div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>เดสก์ท็อป · ตาราง</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:14px;min-width:0">
+<div style="display:flex;align-items:center;gap:12px"><h1 style="margin:0;font-size:28px">คอนเทนต์</h1><span style="flex:1"></span><input class="input" style="width:240px" placeholder="ค้นหาหัวข้อ…"><button class="btn btn-primary">+ สร้างใหม่</button></div>
+<div class="seg" style="align-self:flex-start"><span class="seg-opt" style="background:var(--color-accent-100)">ทั้งหมด 48</span><span class="seg-opt">ร่าง 5</span><span class="seg-opt">ตั้งเวลา 6</span><span class="seg-opt">เผยแพร่ 36</span><span class="seg-opt">ล้มเหลว 1</span></div>
+<table class="table" style="font-size:13px"><thead><tr><th>ID</th><th></th><th>หัวข้อ</th><th>สถานะ</th><th>วันที่</th><th>เวลา</th><th>แพลตฟอร์ม</th><th>สร้างเมื่อ</th><th></th></tr></thead><tbody>
+<tr><td>#104</td><td><div style="width:28px;height:44px;background:var(--color-accent-100)"></div></td><td>อาหารเช้า 5 นาที</td><td><span class="tag tag-neutral">ร่าง</span></td><td>2 ต.ค.</td><td>09:00</td><td>TT IG FB YT</td><td>30 ก.ย.</td><td><button class="btn btn-ghost">เปิด</button> ⋯</td></tr>
+<tr><td>#103</td><td><div style="width:28px;height:44px;background:var(--color-accent-100)"></div></td><td>เคล็ดลับนอนหลับให้ลึก</td><td><span class="tag tag-accent">ตั้งเวลา</span></td><td>1 ต.ค.</td><td>09:00</td><td>TT IG FB YT</td><td>29 ก.ย.</td><td><button class="btn btn-ghost">เปิด</button> ⋯</td></tr>
+<tr><td>#102</td><td><div style="width:28px;height:44px;background:var(--color-accent-100)"></div></td><td>5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</td><td><span class="tag tag-outline">บางส่วนล้มเหลว</span></td><td>30 ก.ย.</td><td>09:00</td><td>TT IG FB YT</td><td>28 ก.ย.</td><td><button class="btn btn-ghost">เปิด</button> ⋯</td></tr>
+<tr><td>#101</td><td><div style="width:28px;height:44px;background:var(--color-accent-100)"></div></td><td>ภาษาอังกฤษวันละประโยค</td><td><span class="tag tag-accent">เผยแพร่แล้ว</span></td><td>29 ก.ย.</td><td>09:00</td><td>TT IG FB YT</td><td>27 ก.ย.</td><td><button class="btn btn-ghost">เปิด</button> ⋯</td></tr>
+<tr><td>#100</td><td><div style="width:28px;height:44px;background:var(--color-accent-100)"></div></td><td>ยืดเหยียดหลังนั่งนาน</td><td><span class="tag tag-accent">เผยแพร่แล้ว</span></td><td>28 ก.ย.</td><td>09:00</td><td>TT IG YT</td><td>26 ก.ย.</td><td><button class="btn btn-ghost">เปิด</button> ⋯</td></tr>
+<tr><td>#099</td><td><div style="width:28px;height:44px;background:var(--color-accent-100)"></div></td><td>แอปจดบันทึกที่ควรรู้</td><td><span class="tag tag-accent">เผยแพร่แล้ว</span></td><td>27 ก.ย.</td><td>09:00</td><td>TT IG FB YT</td><td>25 ก.ย.</td><td><button class="btn btn-ghost">เปิด</button> ⋯</td></tr>
+</tbody></table>
+</main>
+</div></div>
+
+<div class="dv-opt" id="2b"><div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>เดสก์ท็อป · รายการ + รายละเอียด</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span>เพิ่มเติม ▾</span></header>
+<div style="flex:1;display:grid;grid-template-columns:340px 1fr;min-height:0">
+<div style="border-right:1px solid var(--color-divider);display:flex;flex-direction:column">
+<div style="padding:14px"><input class="input" placeholder="ค้นหา…"></div>
+<div style="padding:14px;border-top:1px solid var(--color-divider);background:var(--color-accent-100)"><div class="card-kicker">#102 · บางส่วนล้มเหลว</div><div style="font-size:14px">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</div></div>
+<div style="padding:14px;border-top:1px solid var(--color-divider)"><div class="card-kicker">#103 · ตั้งเวลา 1 ต.ค.</div><div style="font-size:14px">เคล็ดลับนอนหลับให้ลึก</div></div>
+<div style="padding:14px;border-top:1px solid var(--color-divider)"><div class="card-kicker">#104 · ร่าง</div><div style="font-size:14px">อาหารเช้า 5 นาที</div></div>
+<div style="padding:14px;border-top:1px solid var(--color-divider)"><div class="card-kicker">#101 · เผยแพร่แล้ว</div><div style="font-size:14px">ภาษาอังกฤษวันละประโยค</div></div>
+</div>
+<div style="padding:24px 28px;display:grid;grid-template-columns:1fr 220px;gap:24px;overflow:hidden">
+<div style="display:flex;flex-direction:column;gap:14px;font-size:14px">
+<div style="display:flex;gap:8px;align-items:center"><h1 style="margin:0;font-size:32px">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</h1></div>
+<div style="display:flex;gap:6px"><button class="btn btn-secondary">แก้ไข</button><button class="btn btn-secondary">ทำสำเนา</button><button class="btn btn-secondary">สร้างวิดีโอ</button><button class="btn btn-secondary">ตั้งเวลา</button><button class="btn btn-primary">เผยแพร่ทันที</button></div>
+<div><div class="card-kicker">Hook</div>เงินเดือนออกวันเดียวหมด? ลอง 5 ข้อนี้</div>
+<div><div class="card-kicker">สคริปต์</div><span style="color:var(--color-neutral-800)">1. แยกบัญชีออมทันทีวันเงินเดือนออก 2. ตั้งเพดานใช้จ่ายรายสัปดาห์ 3. …</span></div>
+<div><div class="card-kicker">แคปชัน</div>ออมง่ายกว่าที่คิด เริ่มวันนี้</div>
+<div><div class="card-kicker">แฮชแท็ก</div>#ออมเงิน #การเงินส่วนตัว #มนุษย์เงินเดือน</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:13px"><div><div class="card-kicker">ความยาว</div>45 วิ</div><div><div class="card-kicker">ภาษา</div>ไทย</div><div><div class="card-kicker">โทน</div>เป็นกันเอง</div><div><div class="card-kicker">กลุ่มเป้าหมาย</div>วัยทำงาน</div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px"><div class="blueprint" style="aspect-ratio:9/16;background:var(--color-accent-100);display:grid;place-items:center;font-size:11px;color:var(--color-accent-800)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>วิดีโอ</div><div class="card-kicker">ประวัติการเผยแพร่</div><div style="font-size:12px;display:flex;flex-direction:column;gap:4px"><span>TikTok ✓</span><span>Instagram ✓</span><span>Facebook ✕ token</span><span>YouTube ✓</span></div></div>
+</div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="2c"><div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider);display:flex;align-items:center"><div style="font:600 24px var(--font-heading);flex:1">คอนเทนต์</div><button class="btn btn-primary" style="min-height:44px">+</button></div>
+<div style="padding:10px 14px;display:flex;gap:6px;overflow:hidden"><span class="tag tag-accent">ทั้งหมด</span><span class="tag tag-neutral">ร่าง</span><span class="tag tag-neutral">ตั้งเวลา</span><span class="tag tag-neutral">ล้มเหลว</span></div>
+<div style="flex:1;overflow:hidden">
+<div style="display:flex;gap:12px;padding:12px 14px;border-top:1px solid var(--color-divider)"><div style="width:44px;height:70px;background:var(--color-accent-100);flex:none"></div><div style="font-size:14px;display:flex;flex-direction:column;gap:4px">อาหารเช้า 5 นาที<span class="tag tag-neutral" style="align-self:flex-start">ร่าง · 2 ต.ค.</span></div></div>
+<div style="display:flex;gap:12px;padding:12px 14px;border-top:1px solid var(--color-divider)"><div style="width:44px;height:70px;background:var(--color-accent-100);flex:none"></div><div style="font-size:14px;display:flex;flex-direction:column;gap:4px">เคล็ดลับนอนหลับให้ลึก<span class="tag tag-accent" style="align-self:flex-start">ตั้งเวลา · 1 ต.ค. 09:00</span></div></div>
+<div style="display:flex;gap:12px;padding:12px 14px;border-top:1px solid var(--color-divider)"><div style="width:44px;height:70px;background:var(--color-accent-100);flex:none"></div><div style="font-size:14px;display:flex;flex-direction:column;gap:4px">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน<span class="tag tag-outline" style="align-self:flex-start">บางส่วนล้มเหลว</span></div></div>
+<div style="display:flex;gap:12px;padding:12px 14px;border-top:1px solid var(--color-divider)"><div style="width:44px;height:70px;background:var(--color-accent-100);flex:none"></div><div style="font-size:14px;display:flex;flex-direction:column;gap:4px">ภาษาอังกฤษวันละประโยค<span class="tag tag-accent" style="align-self:flex-start">เผยแพร่แล้ว</span></div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="2d"><div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>มือถือ · แบบ B (รายละเอียด)</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span>←</span><b style="font:600 18px var(--font-heading)">#102</b></div>
+<div style="display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid var(--color-divider)"><div style="height:200px;background:var(--color-accent-100);border-right:1px solid var(--color-divider)"></div><div style="padding:14px;display:flex;flex-direction:column;gap:6px"><div style="font:600 22px/1.1 var(--font-heading)">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</div><span class="tag tag-outline" style="align-self:flex-start">บางส่วนล้มเหลว</span><span style="font-size:12px">30 ก.ย. · 09:00 · 45 วิ</span></div></div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:12px;font-size:14px"><div><div class="card-kicker">Hook</div>เงินเดือนออกวันเดียวหมด? ลอง 5 ข้อนี้</div><div><div class="card-kicker">แคปชัน</div>ออมง่ายกว่าที่คิด เริ่มวันนี้</div><div><div class="card-kicker">แฮชแท็ก</div>#ออมเงิน #การเงินส่วนตัว</div></div>
+<div style="margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px"><button class="btn btn-secondary" style="min-height:48px">แก้ไข</button><button class="btn btn-primary" style="min-height:48px">เผยแพร่ทันที</button></div>
+</div></div>
+</div>
+</section>
+
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><span class="dv-tid">03</span><span class="dv-tname">AI สร้างคอนเทนต์</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="3a"><div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>เดสก์ท็อป · ฟอร์มซ้าย ผลลัพธ์ขวา</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<div style="width:340px;flex:none;border-right:1px solid var(--color-divider);padding:24px;display:flex;flex-direction:column;gap:12px">
+<h1 style="margin:0;font-size:28px">AI สร้างคอนเทนต์</h1>
+<div class="field"><label>หัวข้อ</label><input class="input" value="วิธีออมเงินสำหรับมนุษย์เงินเดือน"></div>
+<div class="field"><label>นิช</label><input class="input" value="การเงินส่วนตัว"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="field"><label>ภาษา</label><input class="input" value="ไทย"></div><div class="field"><label>ความยาว</label><input class="input" value="45 วินาที"></div><div class="field"><label>โทน</label><input class="input" value="เป็นกันเอง"></div><div class="field"><label>จำนวนไอเดีย</label><input class="input" value="3"></div></div>
+<div class="field"><label>CTA</label><input class="input" value="กดติดตามเพื่อดูตอนต่อไป"></div>
+<div class="field"><label>แพลตฟอร์ม</label><div style="display:flex;gap:4px"><span class="tag tag-accent">TikTok</span><span class="tag tag-accent">IG</span><span class="tag tag-accent">FB</span><span class="tag tag-accent">YT</span></div></div>
+<div class="field"><label>ช่วงวันที่เผยแพร่</label><input class="input" value="1 ต.ค. – 3 ต.ค. 2569"></div>
+<button class="btn btn-primary blueprint" style="margin-top:auto;min-height:42px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>สร้าง</button>
+</div>
+<main style="flex:1;padding:24px;display:flex;flex-direction:column;gap:12px;min-width:0">
+<div style="display:flex;gap:8px;align-items:center"><div class="seg"><span class="seg-opt" style="background:var(--color-accent-100)">ไอเดีย 1</span><span class="seg-opt">ไอเดีย 2</span><span class="seg-opt">ไอเดีย 3</span></div><span style="flex:1"></span><button class="btn btn-ghost">สร้างใหม่</button></div>
+<div class="card blueprint" style="flex:1;font-size:14px;gap:12px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+<div><div class="card-kicker">ชื่อเรื่อง</div><div class="card-title" style="font-size:22px">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</div></div>
+<div><div class="card-kicker">Hook</div>เงินเดือนออกวันเดียวหมด? ลอง 5 ข้อนี้</div>
+<div><div class="card-kicker">Shot list</div>1. ตัวละครเปิดกระเป๋าเงินว่าง · 2. แอปธนาคารแยกบัญชี · 3. ปฏิทินรายสัปดาห์ …</div>
+<div><div class="card-kicker">Visual prompts</div><span style="color:var(--color-neutral-800)">flat illustration, office worker, pastel, 9:16 …</span></div>
+<div><div class="card-kicker">สคริปต์เสียงพากย์</div>ใครเงินเดือนออกแล้วหมดไวยกมือ วันนี้มี 5 วิธี…</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="card-kicker">แคปชัน</div>ออมง่ายกว่าที่คิด เริ่มวันนี้</div><div><div class="card-kicker">แฮชแท็ก</div>#ออมเงิน #การเงินส่วนตัว</div></div>
+</div>
+<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-secondary">บันทึกเป็นร่าง</button><button class="btn btn-primary">เพิ่มเข้าคิว</button></div>
+</main>
+</div></div>
+
+<div class="dv-opt" id="3b"><div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>เดสก์ท็อป · พรอมต์เดียว + เปรียบเทียบไอเดีย</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span>เพิ่มเติม ▾</span></header>
+<div style="padding:28px;border-bottom:1px solid var(--color-divider);display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;gap:10px"><input class="input" style="font-size:18px;min-height:48px" value="วิธีออมเงินสำหรับมนุษย์เงินเดือน"><button class="btn btn-primary" style="min-width:120px">สร้าง</button></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px"><span class="tag tag-outline">การเงินส่วนตัว</span><span class="tag tag-outline">ไทย</span><span class="tag tag-outline">45 วิ</span><span class="tag tag-outline">เป็นกันเอง</span><span class="tag tag-outline">3 ไอเดีย</span><span class="tag tag-outline">TT · IG · FB · YT</span><span class="tag tag-outline">1–3 ต.ค.</span><span class="tag tag-neutral">+ ตัวเลือก</span></div>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:repeat(3,1fr)">
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px;font-size:14px;background:var(--color-accent-100)"><div class="card-kicker">ไอเดีย 01 · เลือกแล้ว</div><div style="font:600 26px/1.1 var(--font-heading)">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</div><div><div class="card-kicker">Hook</div>เงินเดือนออกวันเดียวหมด? ลอง 5 ข้อนี้</div><div><div class="card-kicker">สคริปต์</div>1. แยกบัญชีออม 2. เพดานรายสัปดาห์ 3. …</div><div style="margin-top:auto;display:flex;gap:6px"><button class="btn btn-secondary">บันทึกร่าง</button><button class="btn btn-primary">เพิ่มเข้าคิว</button></div></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px;font-size:14px"><div class="card-kicker">ไอเดีย 02</div><div style="font:600 26px/1.1 var(--font-heading)">กฎ 50/30/20 ใน 45 วินาที</div><div><div class="card-kicker">Hook</div>แบ่งเงินเดือนยังไงไม่ให้ช็อต</div><div><div class="card-kicker">สคริปต์</div>50% จำเป็น 30% ใช้ตามใจ 20% ออม…</div><div style="margin-top:auto;display:flex;gap:6px"><button class="btn btn-secondary">บันทึกร่าง</button><button class="btn btn-secondary">เพิ่มเข้าคิว</button></div></div>
+<div style="padding:24px;display:flex;flex-direction:column;gap:10px;font-size:14px"><div class="card-kicker">ไอเดีย 03</div><div style="font:600 26px/1.1 var(--font-heading)">ออมวันละ 50 บาท ครบปีได้เท่าไร</div><div><div class="card-kicker">Hook</div>ค่ากาแฟแก้วเดียวเปลี่ยนชีวิตได้</div><div><div class="card-kicker">สคริปต์</div>50 × 365 = 18,250 บาท…</div><div style="margin-top:auto;display:flex;gap:6px"><button class="btn btn-secondary">บันทึกร่าง</button><button class="btn btn-secondary">เพิ่มเข้าคิว</button></div></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="3c"><div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">AI สร้างคอนเทนต์</div></div>
+<div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:10px">
+<div class="field"><label>หัวข้อ</label><input class="input" style="min-height:44px" value="วิธีออมเงินสำหรับมนุษย์เงินเดือน"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="field"><label>ภาษา</label><input class="input" style="min-height:44px" value="ไทย"></div><div class="field"><label>ความยาว</label><input class="input" style="min-height:44px" value="45 วิ"></div><div class="field"><label>โทน</label><input class="input" style="min-height:44px" value="เป็นกันเอง"></div><div class="field"><label>ไอเดีย</label><input class="input" style="min-height:44px" value="3"></div></div>
+<div class="field"><label>แพลตฟอร์ม</label><div style="display:flex;gap:4px"><span class="tag tag-accent">TikTok</span><span class="tag tag-accent">IG</span><span class="tag tag-accent">FB</span><span class="tag tag-accent">YT</span></div></div>
+<div style="font-size:13px;color:var(--color-accent-700)">+ ตัวเลือกเพิ่มเติม (นิช, สไตล์, CTA, วันที่)</div>
+</div>
+<div style="padding:16px"><button class="btn btn-primary" style="width:100%;min-height:48px">สร้าง</button></div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="3d"><div class="dv-olabel"><a class="dv-oid" href="#3d">3d</a>มือถือ · แบบ B (ผลลัพธ์)</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span>←</span><b style="font:600 18px var(--font-heading)">ผลลัพธ์ · 3 ไอเดีย</b></div>
+<div style="display:flex;border-bottom:1px solid var(--color-divider);font-size:13px"><div style="flex:1;padding:12px;text-align:center;border-bottom:2px solid var(--color-accent)">01</div><div style="flex:1;padding:12px;text-align:center">02</div><div style="flex:1;padding:12px;text-align:center">03</div></div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:12px;font-size:14px">
+<div style="font:600 28px/1.1 var(--font-heading)">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</div>
+<div><div class="card-kicker">Hook</div>เงินเดือนออกวันเดียวหมด? ลอง 5 ข้อนี้</div>
+<div><div class="card-kicker">สคริปต์</div>1. แยกบัญชีออมทันที 2. ตั้งเพดานรายสัปดาห์ 3. …</div>
+<div><div class="card-kicker">แคปชัน</div>ออมง่ายกว่าที่คิด เริ่มวันนี้</div>
+<div><div class="card-kicker">แฮชแท็ก</div>#ออมเงิน #การเงินส่วนตัว</div>
+</div>
+<div style="margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px"><button class="btn btn-secondary" style="min-height:48px">บันทึกร่าง</button><button class="btn btn-primary" style="min-height:48px">เพิ่มเข้าคิว</button></div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t4">
+<div class="dv-thd"><span class="dv-tid">04</span><span class="dv-tname">สตูดิโอวิดีโอ</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="4a"><div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>เดสก์ท็อป · เพลเยอร์ + สเปก</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:grid;grid-template-columns:340px 1fr;gap:28px;min-width:0">
+<div class="blueprint" style="background:var(--color-accent-100);display:flex;flex-direction:column;justify-content:flex-end"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="flex:1;display:grid;place-items:center;font-size:12px;color:var(--color-accent-800)">เพลเยอร์วิดีโอ 1080×1920</div><div style="display:flex;gap:10px;align-items:center;padding:10px;border-top:1px solid var(--color-divider);font-size:12px">▶<div style="flex:1;height:3px;background:var(--color-accent-200)"><div style="width:35%;height:3px;background:var(--color-accent)"></div></div>0:16 / 0:45</div></div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<div class="card-kicker">#103</div><h1 style="margin:-10px 0 0;font-size:32px">เคล็ดลับนอนหลับให้ลึก</h1>
+<table class="table" style="font-size:14px"><tbody><tr><td>ความยาว</td><td>0:45</td></tr><tr><td>ความละเอียด</td><td>1080 × 1920</td></tr><tr><td>FPS</td><td>30</td></tr><tr><td>เสียง</td><td><span class="tag tag-accent">พร้อม · TTS</span></td></tr><tr><td>ซับไตเติล</td><td><span class="tag tag-accent">ฝังแล้ว</span></td></tr><tr><td>การประมวลผล</td><td><span class="tag tag-accent">เสร็จ 06:40</span></td></tr></tbody></table>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-secondary">สร้างใหม่</button><button class="btn btn-secondary">ประมวลผลซ้ำ</button><button class="btn btn-secondary">เพิ่มซับไตเติล</button><button class="btn btn-secondary">เปลี่ยนเสียง</button><button class="btn btn-secondary">ดาวน์โหลด</button></div>
+<button class="btn btn-primary" style="align-self:flex-start;min-width:160px">ตั้งเวลาเผยแพร่</button>
+</div>
+</main>
+</div></div>
+
+<div class="dv-opt" id="4b"><div class="dv-olabel"><a class="dv-oid" href="#4b">4b</a>เดสก์ท็อป · ไปป์ไลน์เป็นขั้นตอน</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span>เพิ่มเติม ▾</span></header>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--color-divider)">
+<div style="padding:18px;border-right:1px solid var(--color-divider)"><div class="card-kicker">01 สคริปต์</div><div style="font:600 20px var(--font-heading)">เสร็จ</div></div>
+<div style="padding:18px;border-right:1px solid var(--color-divider)"><div class="card-kicker">02 เสียง TTS</div><div style="font:600 20px var(--font-heading)">เสร็จ</div></div>
+<div style="padding:18px;border-right:1px solid var(--color-divider)"><div class="card-kicker">03 ภาพ</div><div style="font:600 20px var(--font-heading)">เสร็จ</div></div>
+<div style="padding:18px;border-right:1px solid var(--color-divider);background:var(--color-accent-100)"><div class="card-kicker">04 FFmpeg</div><div style="font:600 20px var(--font-heading)">กำลังประมวลผล 62%</div></div>
+<div style="padding:18px"><div class="card-kicker">05 ซับไตเติล</div><div style="font:600 20px var(--font-heading);color:var(--color-neutral-600)">รอ</div></div>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:1fr 300px 1fr">
+<div style="padding:24px;border-right:1px solid var(--color-divider);font-size:14px;display:flex;flex-direction:column;gap:10px"><div class="card-kicker">#104 · อาหารเช้า 5 นาที</div><div style="font:600 30px var(--font-heading)">0:42 · 1080×1920 · 30fps</div><div>เสียง: พร้อม</div><div>ซับไตเติล: รอขั้นตอน 05</div></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider)"><div class="blueprint" style="height:100%;background:var(--color-accent-100);display:grid;place-items:center;font-size:12px;color:var(--color-accent-800)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>ตัวอย่าง</div></div>
+<div style="padding:24px;display:flex;flex-direction:column;gap:8px"><div class="card-kicker">การทำงาน</div><button class="btn btn-secondary">ดูตัวอย่าง</button><button class="btn btn-secondary">ประมวลผลซ้ำ</button><button class="btn btn-secondary">เปลี่ยนเสียง</button><button class="btn btn-secondary">ดาวน์โหลด</button><button class="btn btn-primary" style="margin-top:auto" disabled>ตั้งเวลา (รอประมวลผล)</button></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="4c"><div class="dv-olabel"><a class="dv-oid" href="#4c">4c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">#103</div><div style="font:600 22px var(--font-heading)">เคล็ดลับนอนหลับให้ลึก</div></div>
+<div style="height:320px;background:var(--color-accent-100);display:grid;place-items:center;font-size:12px;color:var(--color-accent-800)">วิดีโอ ▶</div>
+<div style="padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px"><div><div class="card-kicker">ความยาว</div>0:45</div><div><div class="card-kicker">ขนาด</div>1080p</div><div><div class="card-kicker">FPS</div>30</div><div><div class="card-kicker">เสียง</div>พร้อม</div><div><div class="card-kicker">ซับ</div>พร้อม</div><div><div class="card-kicker">สถานะ</div>เสร็จ</div></div>
+<div style="margin-top:auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn btn-secondary" style="min-height:48px">ตัวเลือก ⋯</button><button class="btn btn-primary" style="min-height:48px">ตั้งเวลา</button></div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="4d"><div class="dv-olabel"><a class="dv-oid" href="#4d">4d</a>มือถือ · แบบ B</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-size:20px">≡</span><b style="font:600 18px var(--font-heading)">สตูดิโอวิดีโอ</b></div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:0">
+<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--color-divider);font-size:14px">01 สคริปต์<span class="tag tag-accent">เสร็จ</span></div>
+<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--color-divider);font-size:14px">02 เสียง TTS<span class="tag tag-accent">เสร็จ</span></div>
+<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--color-divider);font-size:14px">03 ภาพ<span class="tag tag-accent">เสร็จ</span></div>
+<div style="padding:12px 0;border-bottom:1px solid var(--color-divider);font-size:14px;display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between">04 FFmpeg<span class="tag tag-outline">62%</span></div><div style="height:3px;background:var(--color-accent-200)"><div style="width:62%;height:3px;background:var(--color-accent)"></div></div></div>
+<div style="display:flex;justify-content:space-between;padding:12px 0;font-size:14px;color:var(--color-neutral-700)">05 ซับไตเติล<span class="tag tag-neutral">รอ</span></div>
+</div>
+<div style="margin:0 16px;flex:1;background:var(--color-accent-100);display:grid;place-items:center;font-size:12px;color:var(--color-accent-800)">ตัวอย่าง</div>
+<div style="padding:16px"><button class="btn btn-secondary" style="width:100%;min-height:48px">ดูตัวอย่าง</button></div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t5">
+<div class="dv-thd"><span class="dv-tid">05</span><span class="dv-tname">ปฏิทิน</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="5a"><div class="dv-olabel"><a class="dv-oid" href="#5a">5a</a>เดสก์ท็อป · รายเดือน</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:14px;min-width:0">
+<div style="display:flex;align-items:center;gap:12px"><h1 style="margin:0;font-size:28px">ตุลาคม 2569</h1><button class="btn btn-ghost">‹</button><button class="btn btn-ghost">›</button><span style="flex:1"></span><div class="seg"><span class="seg-opt" style="background:var(--color-accent-100)">เดือน</span><span class="seg-opt">สัปดาห์</span></div></div>
+<div style="flex:1;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:auto repeat(5,1fr);border-top:1px solid var(--color-divider);border-left:1px solid var(--color-divider);font-size:12px">
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)" class="card-kicker">จ.</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)" class="card-kicker">อ.</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)" class="card-kicker">พ.</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)" class="card-kicker">พฤ.</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)" class="card-kicker">ศ.</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)" class="card-kicker">ส.</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)" class="card-kicker">อา.</div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);color:var(--color-neutral-500)">29</div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);background:var(--color-accent-100)"><b>30</b><div style="margin-top:4px;padding:4px;border:1px solid var(--color-accent);font-size:11px">09:00 ออมเงิน · 3/4</div></div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">1<div style="margin-top:4px;padding:4px;border:1px solid var(--color-divider);font-size:11px">09:00 นอนหลับ</div></div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">2<div style="margin-top:4px;padding:4px;border:1px dashed var(--color-divider);font-size:11px">09:00 อาหารเช้า · ร่าง</div></div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">3<div style="margin-top:4px;padding:4px;border:1px solid var(--color-divider);font-size:11px">09:00 50/30/20</div></div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">4<div style="margin-top:4px;padding:4px;border:1px solid var(--color-divider);font-size:11px">09:00 ยืดเหยียด</div></div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">5<div style="margin-top:4px;padding:4px;border:1px solid var(--color-divider);font-size:11px">09:00 แอปจดโน้ต</div></div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">6</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">7</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">8</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">9</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">10</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">11</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">12</div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">13</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">14</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">15</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">16</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">17</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">18</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">19</div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">20</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">21</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">22</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">23</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">24</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">25</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">26</div>
+<div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">27</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">28</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">29</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">30</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">31</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);color:var(--color-neutral-500)">1</div><div style="padding:6px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);color:var(--color-neutral-500)">2</div>
+</div>
+<div style="font-size:12px;color:var(--color-neutral-700)">ลากการ์ดเพื่อเปลี่ยนวัน · คลิกเพื่อเปิด</div>
+</main>
+</div></div>
+
+<div class="dv-opt" id="5b"><div class="dv-olabel"><a class="dv-oid" href="#5b">5b</a>เดสก์ท็อป · รายสัปดาห์ การ์ดใหญ่</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span>เพิ่มเติม ▾</span></header>
+<div style="padding:18px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--color-divider)"><div style="font:600 30px var(--font-heading)">30 ก.ย. – 6 ต.ค.</div><span style="flex:1"></span><div class="seg"><span class="seg-opt">เดือน</span><span class="seg-opt" style="background:var(--color-accent-100)">สัปดาห์</span></div></div>
+<div style="flex:1;display:grid;grid-template-columns:repeat(7,1fr)">
+<div style="padding:14px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px;background:var(--color-accent-100)"><div class="card-kicker">อ. 30 · วันนี้</div><div class="blueprint" style="padding:8px;display:flex;flex-direction:column;gap:6px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="aspect-ratio:9/16;background:var(--color-accent-200)"></div><b style="font-size:12px">09:00</b><span style="font-size:12px">5 วิธีออมเงิน</span><span class="tag tag-outline">3/4 สำเร็จ</span></div></div>
+<div style="padding:14px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px"><div class="card-kicker">พ. 1</div><div class="blueprint" style="padding:8px;display:flex;flex-direction:column;gap:6px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="aspect-ratio:9/16;background:var(--color-accent-100)"></div><b style="font-size:12px">09:00</b><span style="font-size:12px">นอนหลับให้ลึก</span><span class="tag tag-accent">ตั้งเวลา</span></div></div>
+<div style="padding:14px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px"><div class="card-kicker">พฤ. 2</div><div class="blueprint" style="padding:8px;display:flex;flex-direction:column;gap:6px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="aspect-ratio:9/16;background:var(--color-accent-100)"></div><b style="font-size:12px">09:00</b><span style="font-size:12px">อาหารเช้า 5 นาที</span><span class="tag tag-neutral">ร่าง</span></div></div>
+<div style="padding:14px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px"><div class="card-kicker">ศ. 3</div><div class="blueprint" style="padding:8px;display:flex;flex-direction:column;gap:6px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="aspect-ratio:9/16;background:var(--color-accent-100)"></div><b style="font-size:12px">09:00</b><span style="font-size:12px">กฎ 50/30/20</span><span class="tag tag-accent">ตั้งเวลา</span></div></div>
+<div style="padding:14px;border-right:1px solid var(--color-divider)"><div class="card-kicker">ส. 4</div><div style="margin-top:8px;border:1px dashed var(--color-divider);height:120px;display:grid;place-items:center;font-size:12px;color:var(--color-neutral-600)">ว่าง · + เพิ่ม</div></div>
+<div style="padding:14px;border-right:1px solid var(--color-divider)"><div class="card-kicker">อา. 5</div></div>
+<div style="padding:14px"><div class="card-kicker">จ. 6</div></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="5c"><div class="dv-olabel"><a class="dv-oid" href="#5c">5c</a>มือถือ · แบบ A (รายการวัน)</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">ปฏิทิน</div></div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;border-bottom:1px solid var(--color-divider)"><div style="padding:10px 0;background:var(--color-accent-100)">อ.<br><b>30</b></div><div style="padding:10px 0">พ.<br><b>1</b></div><div style="padding:10px 0">พฤ.<br><b>2</b></div><div style="padding:10px 0">ศ.<br><b>3</b></div><div style="padding:10px 0">ส.<br><b>4</b></div><div style="padding:10px 0">อา.<br><b>5</b></div><div style="padding:10px 0">จ.<br><b>6</b></div></div>
+<div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:10px">
+<div class="card" style="flex-direction:row;gap:12px"><div style="width:56px;height:90px;background:var(--color-accent-100);flex:none"></div><div style="display:flex;flex-direction:column;gap:4px;font-size:14px"><b>09:00</b>5 วิธีออมเงินสำหรับมนุษย์เงินเดือน<div style="display:flex;gap:3px"><span class="tag tag-accent">TT</span><span class="tag tag-accent">IG</span><span class="tag tag-outline">FB</span><span class="tag tag-accent">YT</span></div></div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="5d"><div class="dv-olabel"><a class="dv-oid" href="#5d">5d</a>มือถือ · แบบ B (ไทม์ไลน์)</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-size:20px">≡</span><b style="font:600 18px var(--font-heading)">ปฏิทิน · ตุลาคม</b></div>
+<div style="padding:8px 16px;display:flex;flex-direction:column">
+<div style="display:grid;grid-template-columns:56px 1fr;padding:12px 0;border-bottom:1px solid var(--color-divider)"><div style="font:600 30px/1 var(--font-heading)">30</div><div style="font-size:14px">5 วิธีออมเงิน<br><span class="tag tag-outline">3/4</span></div></div>
+<div style="display:grid;grid-template-columns:56px 1fr;padding:12px 0;border-bottom:1px solid var(--color-divider)"><div style="font:600 30px/1 var(--font-heading)">01</div><div style="font-size:14px">นอนหลับให้ลึก<br><span class="tag tag-accent">ตั้งเวลา</span></div></div>
+<div style="display:grid;grid-template-columns:56px 1fr;padding:12px 0;border-bottom:1px solid var(--color-divider)"><div style="font:600 30px/1 var(--font-heading)">02</div><div style="font-size:14px">อาหารเช้า 5 นาที<br><span class="tag tag-neutral">ร่าง</span></div></div>
+<div style="display:grid;grid-template-columns:56px 1fr;padding:12px 0;border-bottom:1px solid var(--color-divider)"><div style="font:600 30px/1 var(--font-heading)">03</div><div style="font-size:14px">กฎ 50/30/20<br><span class="tag tag-accent">ตั้งเวลา</span></div></div>
+<div style="display:grid;grid-template-columns:56px 1fr;padding:12px 0;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600)"><div style="font:600 30px/1 var(--font-heading)">04</div><div style="font-size:14px">ว่าง</div></div>
+</div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t6">
+<div class="dv-thd"><span class="dv-tid">06</span><span class="dv-tname">ระบบอัตโนมัติ</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="6a"><div class="dv-olabel"><a class="dv-oid" href="#6a">6a</a>เดสก์ท็อป · ฟอร์มตั้งค่า</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:18px;max-width:720px">
+<div style="display:flex;align-items:center;gap:12px"><h1 style="margin:0;font-size:28px">ระบบอัตโนมัติ</h1><span style="flex:1"></span><div class="seg"><span class="seg-opt" style="background:var(--color-accent);color:var(--color-bg)">เปิด</span><span class="seg-opt">ปิด</span></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 20px">
+<div class="field"><label>เขตเวลา</label><input class="input" value="Asia/Bangkok"></div>
+<div class="field"><label>จำนวนต่อวัน</label><input class="input" value="1"></div>
+<div class="field"><label>เวลาเผยแพร่</label><input class="input" value="09:00"></div>
+<div class="field"><label>สร้างคอนเทนต์ล่วงหน้า</label><input class="input" value="3 ชั่วโมง"></div>
+<div class="field"><label>จำนวนครั้งที่ลองใหม่</label><input class="input" value="3"></div>
+<div class="field"><label>หน่วงก่อนลองใหม่</label><input class="input" value="10 นาที"></div>
+<div class="field"><label>งานพร้อมกันสูงสุด</label><input class="input" value="1"></div>
+<div class="field"><label>แพลตฟอร์ม</label><div style="display:flex;gap:4px"><span class="tag tag-accent">TikTok</span><span class="tag tag-accent">IG</span><span class="tag tag-accent">FB</span><span class="tag tag-accent">YT</span></div></div>
+</div>
+<div style="font-size:13px;color:var(--color-neutral-700)">รอบถัดไป: เริ่มสร้าง 06:00 · เผยแพร่ 09:00 พรุ่งนี้</div>
+<div style="display:flex;gap:8px"><button class="btn btn-primary">บันทึก</button><button class="btn btn-secondary">รันทดสอบ</button></div>
+</main>
+</div></div>
+
+<div class="dv-opt" id="6b"><div class="dv-olabel"><a class="dv-oid" href="#6b">6b</a>เดสก์ท็อป · ไทม์ไลน์รอบประจำวัน</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">อัตโนมัติ</span></header>
+<div style="padding:28px;border-bottom:1px solid var(--color-divider);display:flex;align-items:flex-end;gap:20px"><div><div class="card-kicker">สถานะ</div><div style="font:600 48px/1 var(--font-heading)">ทำงานอยู่ · 1 โพสต์/วัน</div></div><span style="flex:1"></span><button class="btn btn-secondary">หยุดชั่วคราว</button></div>
+<div style="padding:28px 28px 0"><div class="card-kicker">รอบประจำวัน (Asia/Bangkok)</div>
+<div style="position:relative;margin-top:30px;height:2px;background:var(--color-divider)">
+<div style="position:absolute;left:25%;top:-6px;width:12px;height:12px;background:var(--color-accent)"></div><div style="position:absolute;left:25%;top:18px;font-size:13px;transform:translateX(-40%)"><b>06:00</b><br>Claude สร้างสคริปต์</div>
+<div style="position:absolute;left:30%;top:-6px;width:12px;height:12px;background:var(--color-accent)"></div><div style="position:absolute;left:31%;top:-46px;font-size:13px"><b>06:15</b> TTS + FFmpeg</div>
+<div style="position:absolute;left:37.5%;top:-6px;width:12px;height:12px;border:2px solid var(--color-accent);background:var(--color-bg)"></div><div style="position:absolute;left:37.5%;top:18px;font-size:13px"><b>09:00</b><br>เผยแพร่ 4 แพลตฟอร์ม</div>
+</div></div>
+<div style="margin-top:auto;display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--color-divider)">
+<div style="padding:18px;border-right:1px solid var(--color-divider)"><div class="card-kicker">ต่อวัน</div><div style="font:600 28px var(--font-heading)">1</div></div>
+<div style="padding:18px;border-right:1px solid var(--color-divider)"><div class="card-kicker">เวลา</div><div style="font:600 28px var(--font-heading)">09:00</div></div>
+<div style="padding:18px;border-right:1px solid var(--color-divider)"><div class="card-kicker">ล่วงหน้า</div><div style="font:600 28px var(--font-heading)">3 ชม.</div></div>
+<div style="padding:18px;border-right:1px solid var(--color-divider)"><div class="card-kicker">ลองใหม่</div><div style="font:600 28px var(--font-heading)">3 × 10น.</div></div>
+<div style="padding:18px;border-right:1px solid var(--color-divider)"><div class="card-kicker">พร้อมกัน</div><div style="font:600 28px var(--font-heading)">1</div></div>
+<div style="padding:18px;display:flex;align-items:center"><button class="btn btn-primary" style="width:100%">แก้ไข</button></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="6c"><div class="dv-olabel"><a class="dv-oid" href="#6c">6c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider);display:flex;align-items:center"><div style="font:600 24px var(--font-heading);flex:1">ระบบอัตโนมัติ</div><div class="seg"><span class="seg-opt" style="background:var(--color-accent);color:var(--color-bg)">เปิด</span><span class="seg-opt">ปิด</span></div></div>
+<div style="flex:1;font-size:14px">
+<div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider)">เขตเวลา<b>Asia/Bangkok</b></div>
+<div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider)">จำนวนต่อวัน<b>1</b></div>
+<div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider)">เวลาเผยแพร่<b>09:00</b></div>
+<div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider)">สร้างล่วงหน้า<b>3 ชม.</b></div>
+<div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider)">ลองใหม่<b>3 ครั้ง · 10 นาที</b></div>
+<div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider)">งานพร้อมกัน<b>1</b></div>
+<div style="display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--color-divider)">แพลตฟอร์ม<b>4</b></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="6d"><div class="dv-olabel"><a class="dv-oid" href="#6d">6d</a>มือถือ · แบบ B</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-size:20px">≡</span><b style="font:600 18px var(--font-heading)">ระบบอัตโนมัติ</b></div>
+<div style="padding:20px 16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">สถานะ</div><div style="font:600 36px/1 var(--font-heading)">ทำงานอยู่</div></div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:14px;font-size:14px;border-left:2px solid var(--color-accent);margin:16px"><div><b>06:00</b> Claude สร้างสคริปต์</div><div><b>06:15</b> TTS + FFmpeg</div><div><b>09:00</b> เผยแพร่ 4 แพลตฟอร์ม</div></div>
+<div style="margin-top:auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn btn-secondary" style="min-height:48px">หยุดชั่วคราว</button><button class="btn btn-primary" style="min-height:48px">แก้ไข</button></div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t7">
+<div class="dv-thd"><span class="dv-tid">07</span><span class="dv-tname">บัญชีโซเชียล</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="7a"><div class="dv-olabel"><a class="dv-oid" href="#7a">7a</a>เดสก์ท็อป · การ์ดบัญชี</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:18px;min-width:0">
+<h1 style="margin:0;font-size:28px">บัญชีโซเชียล</h1>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="display:flex;align-items:center"><span class="card-kicker" style="flex:1">TikTok</span><span class="tag tag-accent">เชื่อมต่อแล้ว</span></div><span class="card-title" style="font-size:22px">@saveeasy.th</span><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px"><div><div class="card-kicker">โทเคนหมดอายุ</div>14 พ.ย. 2569</div><div><div class="card-kicker">สิทธิ์</div>video.publish</div><div><div class="card-kicker">สำเร็จล่าสุด</div>30 ก.ย. 08:59</div></div><div style="display:flex;gap:6px"><button class="btn btn-secondary">ทดสอบ</button><button class="btn btn-ghost">ตัดการเชื่อมต่อ</button></div></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="display:flex;align-items:center"><span class="card-kicker" style="flex:1">Instagram</span><span class="tag tag-accent">เชื่อมต่อแล้ว</span></div><span class="card-title" style="font-size:22px">@saveeasy.th</span><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px"><div><div class="card-kicker">โทเคนหมดอายุ</div>28 พ.ย. 2569</div><div><div class="card-kicker">สิทธิ์</div>content_publish</div><div><div class="card-kicker">สำเร็จล่าสุด</div>30 ก.ย. 09:01</div></div><div style="display:flex;gap:6px"><button class="btn btn-secondary">ทดสอบ</button><button class="btn btn-ghost">ตัดการเชื่อมต่อ</button></div></div>
+<div class="card blueprint" style="border-color:var(--color-accent)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="display:flex;align-items:center"><span class="card-kicker" style="flex:1">Facebook Page</span><span class="tag tag-outline">โทเคนหมดอายุ</span></div><span class="card-title" style="font-size:22px">ออมง่าย ทำได้จริง</span><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px"><div><div class="card-kicker">โทเคนหมดอายุ</div>29 ก.ย. 2569</div><div><div class="card-kicker">สิทธิ์</div>pages_manage_posts</div><div><div class="card-kicker">สำเร็จล่าสุด</div>29 ก.ย. 09:01</div></div><div style="display:flex;gap:6px"><button class="btn btn-primary">เชื่อมต่อใหม่</button><button class="btn btn-ghost">ตัดการเชื่อมต่อ</button></div></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="display:flex;align-items:center"><span class="card-kicker" style="flex:1">YouTube</span><span class="tag tag-accent">เชื่อมต่อแล้ว</span></div><span class="card-title" style="font-size:22px">ออมง่าย Shorts</span><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px"><div><div class="card-kicker">โทเคน</div>รีเฟรชอัตโนมัติ</div><div><div class="card-kicker">สิทธิ์</div>youtube.upload</div><div><div class="card-kicker">สำเร็จล่าสุด</div>30 ก.ย. 09:02</div></div><div style="display:flex;gap:6px"><button class="btn btn-secondary">ทดสอบ</button><button class="btn btn-ghost">ตัดการเชื่อมต่อ</button></div></div>
+</div>
+</main>
+</div></div>
+
+<div class="dv-opt" id="7b"><div class="dv-olabel"><a class="dv-oid" href="#7b">7b</a>เดสก์ท็อป · ตารางสเปก</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">บัญชี</span></header>
+<div style="flex:1;display:grid;grid-template-columns:200px repeat(4,1fr);font-size:14px">
+<div style="border-right:1px solid var(--color-divider)"><div style="height:120px;border-bottom:1px solid var(--color-divider)"></div><div class="card-kicker" style="padding:14px;border-bottom:1px solid var(--color-divider)">บัญชี</div><div class="card-kicker" style="padding:14px;border-bottom:1px solid var(--color-divider)">สถานะ</div><div class="card-kicker" style="padding:14px;border-bottom:1px solid var(--color-divider)">โทเคนหมดอายุ</div><div class="card-kicker" style="padding:14px;border-bottom:1px solid var(--color-divider)">สิทธิ์</div><div class="card-kicker" style="padding:14px;border-bottom:1px solid var(--color-divider)">สำเร็จล่าสุด</div></div>
+<div style="border-right:1px solid var(--color-divider)"><div style="height:120px;border-bottom:1px solid var(--color-divider);padding:20px;font:600 32px var(--font-heading)">TikTok</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">@saveeasy.th</div><div style="padding:12px 14px;border-bottom:1px solid var(--color-divider)"><span class="tag tag-accent">เชื่อมต่อ</span></div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">14 พ.ย.</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">video.publish</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">08:59</div><div style="padding:14px"><button class="btn btn-secondary">ทดสอบ</button></div></div>
+<div style="border-right:1px solid var(--color-divider)"><div style="height:120px;border-bottom:1px solid var(--color-divider);padding:20px;font:600 32px var(--font-heading)">Instagram</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">@saveeasy.th</div><div style="padding:12px 14px;border-bottom:1px solid var(--color-divider)"><span class="tag tag-accent">เชื่อมต่อ</span></div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">28 พ.ย.</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">content_publish</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">09:01</div><div style="padding:14px"><button class="btn btn-secondary">ทดสอบ</button></div></div>
+<div style="border-right:1px solid var(--color-divider);background:var(--color-accent-100)"><div style="height:120px;border-bottom:1px solid var(--color-divider);padding:20px;font:600 32px var(--font-heading)">Facebook</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">ออมง่าย ทำได้จริง</div><div style="padding:12px 14px;border-bottom:1px solid var(--color-divider)"><span class="tag tag-outline">หมดอายุ</span></div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">29 ก.ย.</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">pages_manage_posts</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">เมื่อวาน</div><div style="padding:14px"><button class="btn btn-primary">เชื่อมต่อใหม่</button></div></div>
+<div><div style="height:120px;border-bottom:1px solid var(--color-divider);padding:20px;font:600 32px var(--font-heading)">YouTube</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">ออมง่าย Shorts</div><div style="padding:12px 14px;border-bottom:1px solid var(--color-divider)"><span class="tag tag-accent">เชื่อมต่อ</span></div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">อัตโนมัติ</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">youtube.upload</div><div style="padding:14px;border-bottom:1px solid var(--color-divider)">09:02</div><div style="padding:14px"><button class="btn btn-secondary">ทดสอบ</button></div></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="7c"><div class="dv-olabel"><a class="dv-oid" href="#7c">7c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">บัญชีโซเชียล</div></div>
+<div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:10px">
+<div class="card" style="gap:4px"><div style="display:flex"><b style="flex:1">TikTok</b><span class="tag tag-accent">เชื่อมต่อ</span></div><span style="font-size:13px">@saveeasy.th · หมดอายุ 14 พ.ย.</span></div>
+<div class="card" style="gap:4px"><div style="display:flex"><b style="flex:1">Instagram</b><span class="tag tag-accent">เชื่อมต่อ</span></div><span style="font-size:13px">@saveeasy.th · หมดอายุ 28 พ.ย.</span></div>
+<div class="card blueprint" style="gap:6px;border-color:var(--color-accent)"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div style="display:flex"><b style="flex:1">Facebook</b><span class="tag tag-outline">หมดอายุ</span></div><span style="font-size:13px">ออมง่าย ทำได้จริง · 29 ก.ย.</span><button class="btn btn-primary" style="min-height:44px">เชื่อมต่อใหม่</button></div>
+<div class="card" style="gap:4px"><div style="display:flex"><b style="flex:1">YouTube</b><span class="tag tag-accent">เชื่อมต่อ</span></div><span style="font-size:13px">ออมง่าย Shorts · รีเฟรชอัตโนมัติ</span></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="7d"><div class="dv-olabel"><a class="dv-oid" href="#7d">7d</a>มือถือ · แบบ B</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-size:20px">≡</span><b style="font:600 18px var(--font-heading)">บัญชีโซเชียล</b></div>
+<div style="display:grid;grid-template-columns:1fr 1fr">
+<div style="padding:18px 16px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);min-height:120px"><div style="font:600 24px var(--font-heading)">TikTok</div><span class="tag tag-accent">ปกติ</span></div>
+<div style="padding:18px 16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">Instagram</div><span class="tag tag-accent">ปกติ</span></div>
+<div style="padding:18px 16px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);min-height:120px;background:var(--color-accent-100)"><div style="font:600 24px var(--font-heading)">Facebook</div><span class="tag tag-outline">หมดอายุ</span></div>
+<div style="padding:18px 16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">YouTube</div><span class="tag tag-accent">ปกติ</span></div>
+</div>
+<div style="padding:16px;font-size:14px">Facebook: OAuth token หมดอายุเมื่อ 29 ก.ย. การเผยแพร่ไปยัง Facebook จะล้มเหลวจนกว่าจะเชื่อมต่อใหม่</div>
+<div style="margin-top:auto;padding:16px"><button class="btn btn-primary" style="width:100%;min-height:48px">เชื่อมต่อ Facebook ใหม่</button></div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t8">
+<div class="dv-thd"><span class="dv-tid">08</span><span class="dv-tname">การเผยแพร่</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="8a"><div class="dv-olabel"><a class="dv-oid" href="#8a">8a</a>เดสก์ท็อป · แยกตามแพลตฟอร์ม</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:14px;min-width:0">
+<h1 style="margin:0;font-size:28px">การเผยแพร่</h1>
+<table class="table" style="font-size:13px"><thead><tr><th>คอนเทนต์</th><th>เวลา</th><th>TikTok</th><th>Instagram</th><th>Facebook</th><th>YouTube</th></tr></thead><tbody>
+<tr style="background:var(--color-accent-100)"><td>#102 ออมเงิน</td><td>30 ก.ย. 09:00</td><td><span class="tag tag-accent">สำเร็จ</span></td><td><span class="tag tag-accent">สำเร็จ</span></td><td><span class="tag tag-outline">ล้มเหลว</span></td><td><span class="tag tag-accent">สำเร็จ</span></td></tr>
+<tr><td>#101 ภาษาอังกฤษ</td><td>29 ก.ย. 09:00</td><td><span class="tag tag-accent">สำเร็จ</span></td><td><span class="tag tag-accent">สำเร็จ</span></td><td><span class="tag tag-accent">สำเร็จ</span></td><td><span class="tag tag-accent">สำเร็จ</span></td></tr>
+<tr><td>#100 ยืดเหยียด</td><td>28 ก.ย. 09:00</td><td><span class="tag tag-accent">สำเร็จ</span></td><td><span class="tag tag-accent">สำเร็จ</span></td><td><span class="tag tag-neutral">ไม่ได้เลือก</span></td><td><span class="tag tag-accent">สำเร็จ</span></td></tr>
+<tr><td>#103 นอนหลับ</td><td>1 ต.ค. 09:00</td><td><span class="tag tag-neutral">รอ</span></td><td><span class="tag tag-neutral">รอ</span></td><td><span class="tag tag-neutral">รอ</span></td><td><span class="tag tag-neutral">รอ</span></td></tr>
+</tbody></table>
+<div class="card blueprint" style="max-width:560px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">#102 · Facebook · ลองแล้ว 3/3</span><span class="card-title">OAuth token expired</span><span style="font:12px ui-monospace,monospace;color:var(--color-neutral-700)">request_id 7f3a…c21 · 09:01:14</span><div style="display:flex;gap:8px"><button class="btn btn-primary">เชื่อมต่อใหม่</button><button class="btn btn-secondary">ลองอีกครั้ง</button></div></div>
+</main>
+</div></div>
+
+<div class="dv-opt" id="8b"><div class="dv-olabel"><a class="dv-oid" href="#8b">8b</a>เดสก์ท็อป · มุมมองต่อคอนเทนต์</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">เผยแพร่</span><span>สถิติ</span><span>เพิ่มเติม ▾</span></header>
+<div style="padding:24px 28px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">Content #102 · 30 ก.ย. 09:00</div><div style="font:600 36px var(--font-heading)">5 วิธีออมเงินสำหรับมนุษย์เงินเดือน</div></div>
+<div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr)">
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px"><div class="card-kicker">TikTok</div><div style="font:600 40px/1 var(--font-heading)">SUCCESS</div><div style="font-size:13px">08:59:40 · ครั้งที่ 1</div></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px"><div class="card-kicker">Instagram</div><div style="font:600 40px/1 var(--font-heading)">SUCCESS</div><div style="font-size:13px">09:01:02 · ครั้งที่ 1</div></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:10px;background:var(--color-accent-100)"><div class="card-kicker">Facebook</div><div style="font:600 40px/1 var(--font-heading);color:var(--color-accent-800)">FAILED</div><div style="font-size:13px">OAuth token expired<br>ลอง 3/3 · 09:21</div><div style="margin-top:auto;display:flex;flex-direction:column;gap:6px"><button class="btn btn-primary">เชื่อมต่อใหม่</button><button class="btn btn-secondary">ลองอีกครั้ง</button></div></div>
+<div style="padding:24px;display:flex;flex-direction:column;gap:10px"><div class="card-kicker">YouTube</div><div style="font:600 40px/1 var(--font-heading)">SUCCESS</div><div style="font-size:13px">09:02:18 · ครั้งที่ 1</div></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="8c"><div class="dv-olabel"><a class="dv-oid" href="#8c">8c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">การเผยแพร่</div></div>
+<div style="flex:1">
+<div style="padding:14px 16px;border-bottom:1px solid var(--color-divider);font-size:14px"><b>#102 ออมเงิน</b> · 30 ก.ย.<div style="display:flex;gap:4px;margin-top:6px"><span class="tag tag-accent">TT ✓</span><span class="tag tag-accent">IG ✓</span><span class="tag tag-outline">FB ✕</span><span class="tag tag-accent">YT ✓</span></div></div>
+<div style="padding:14px 16px;border-bottom:1px solid var(--color-divider);font-size:14px"><b>#101 ภาษาอังกฤษ</b> · 29 ก.ย.<div style="display:flex;gap:4px;margin-top:6px"><span class="tag tag-accent">TT ✓</span><span class="tag tag-accent">IG ✓</span><span class="tag tag-accent">FB ✓</span><span class="tag tag-accent">YT ✓</span></div></div>
+<div style="padding:14px 16px;border-bottom:1px solid var(--color-divider);font-size:14px"><b>#103 นอนหลับ</b> · 1 ต.ค.<div style="display:flex;gap:4px;margin-top:6px"><span class="tag tag-neutral">TT รอ</span><span class="tag tag-neutral">IG รอ</span><span class="tag tag-neutral">FB รอ</span><span class="tag tag-neutral">YT รอ</span></div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">เผยแพร่</div><div style="padding:14px 0">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="8d"><div class="dv-olabel"><a class="dv-oid" href="#8d">8d</a>มือถือ · แบบ B</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span>←</span><b style="font:600 18px var(--font-heading)">Content #102</b></div>
+<div style="font:14px ui-monospace,monospace;padding:16px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;justify-content:space-between">TikTok<b>SUCCESS</b></div><div style="display:flex;justify-content:space-between">Instagram<b>SUCCESS</b></div><div style="display:flex;justify-content:space-between;color:var(--color-accent-800)">Facebook<b>FAILED</b></div><div style="display:flex;justify-content:space-between">YouTube<b>SUCCESS</b></div>
+</div>
+<div class="card blueprint" style="margin:0 16px"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">Facebook error</span><span style="font-size:14px">OAuth token expired</span></div>
+<div style="margin-top:auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><button class="btn btn-primary" style="min-height:48px">เชื่อมต่อใหม่</button><button class="btn btn-secondary" style="min-height:48px">ลองอีกครั้ง</button></div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t9">
+<div class="dv-thd"><span class="dv-tid">09</span><span class="dv-tname">สถิติ</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="9a"><div class="dv-olabel"><a class="dv-oid" href="#9a">9a</a>เดสก์ท็อป · ตัวเลข + กราฟ</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:16px;min-width:0">
+<div style="display:flex;align-items:center;gap:12px"><h1 style="margin:0;font-size:28px">สถิติ</h1><span style="flex:1"></span><div class="seg"><span class="seg-opt">7 วัน</span><span class="seg-opt" style="background:var(--color-accent-100)">30 วัน</span><span class="seg-opt">90 วัน</span></div></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">สร้างวิดีโอ</span><span style="font:600 32px var(--font-heading)">30</span></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">เผยแพร่</span><span style="font:600 32px var(--font-heading)">114</span></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">ล้มเหลว</span><span style="font:600 32px var(--font-heading)">3</span></div>
+<div class="card blueprint"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><span class="card-kicker">อัตราสำเร็จ</span><span style="font:600 32px var(--font-heading)">97.4%</span></div>
+</div>
+<div class="card" style="flex:1"><span class="card-kicker">ยอดวิวรายวัน (ทุกแพลตฟอร์มที่ API ให้ข้อมูล)</span>
+<div style="flex:1;display:flex;align-items:flex-end;gap:6px;border-bottom:1px solid var(--color-divider);min-height:180px"><div style="flex:1;height:30%;background:var(--color-accent-300)"></div><div style="flex:1;height:42%;background:var(--color-accent-300)"></div><div style="flex:1;height:38%;background:var(--color-accent-300)"></div><div style="flex:1;height:55%;background:var(--color-accent-300)"></div><div style="flex:1;height:48%;background:var(--color-accent-300)"></div><div style="flex:1;height:62%;background:var(--color-accent-300)"></div><div style="flex:1;height:58%;background:var(--color-accent-300)"></div><div style="flex:1;height:70%;background:var(--color-accent-300)"></div><div style="flex:1;height:66%;background:var(--color-accent-300)"></div><div style="flex:1;height:80%;background:var(--color-accent-300)"></div><div style="flex:1;height:74%;background:var(--color-accent-300)"></div><div style="flex:1;height:88%;background:var(--color-accent)"></div></div></div>
+<table class="table" style="font-size:13px"><thead><tr><th>แพลตฟอร์ม</th><th>วิว</th><th>ไลก์</th><th>คอมเมนต์</th><th>แชร์</th><th>Engagement</th></tr></thead><tbody><tr><td>TikTok</td><td>48,200</td><td>3,110</td><td>214</td><td>402</td><td>7.7%</td></tr><tr><td>Instagram</td><td>21,900</td><td>1,480</td><td>96</td><td>—</td><td>7.2%</td></tr><tr><td>Facebook</td><td>9,400</td><td>520</td><td>41</td><td>88</td><td>6.9%</td></tr><tr><td>YouTube</td><td>15,300</td><td>910</td><td>63</td><td>—</td><td>6.4%</td></tr></tbody></table>
+</main>
+</div></div>
+
+<div class="dv-opt" id="9b"><div class="dv-olabel"><a class="dv-oid" href="#9b">9b</a>เดสก์ท็อป · เปรียบเทียบแพลตฟอร์ม</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">สถิติ</span><span>เพิ่มเติม ▾</span></header>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--color-divider)">
+<div style="padding:24px;border-right:1px solid var(--color-divider)"><div class="card-kicker">สร้างวิดีโอ · 30 วัน</div><div style="font:600 64px/1 var(--font-heading)">30</div></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider)"><div class="card-kicker">เผยแพร่</div><div style="font:600 64px/1 var(--font-heading)">114</div></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider)"><div class="card-kicker">ล้มเหลว</div><div style="font:600 64px/1 var(--font-heading)">3</div></div>
+<div style="padding:24px"><div class="card-kicker">อัตราสำเร็จ</div><div style="font:600 64px/1 var(--font-heading)">97.4%</div></div>
+</div>
+<div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr)">
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:12px;font-size:14px"><div style="font:600 26px var(--font-heading)">TikTok</div><div><div class="card-kicker">วิว</div><div style="height:10px;background:var(--color-accent);width:100%"></div>48,200</div><div><div class="card-kicker">ไลก์</div>3,110</div><div><div class="card-kicker">คอมเมนต์</div>214</div><div><div class="card-kicker">แชร์</div>402</div><div><div class="card-kicker">Engagement</div>7.7%</div></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:12px;font-size:14px"><div style="font:600 26px var(--font-heading)">Instagram</div><div><div class="card-kicker">วิว</div><div style="height:10px;background:var(--color-accent);width:45%"></div>21,900</div><div><div class="card-kicker">ไลก์</div>1,480</div><div><div class="card-kicker">คอมเมนต์</div>96</div><div><div class="card-kicker">แชร์</div>API ไม่ให้ข้อมูล</div><div><div class="card-kicker">Engagement</div>7.2%</div></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:12px;font-size:14px"><div style="font:600 26px var(--font-heading)">Facebook</div><div><div class="card-kicker">วิว</div><div style="height:10px;background:var(--color-accent);width:20%"></div>9,400</div><div><div class="card-kicker">ไลก์</div>520</div><div><div class="card-kicker">คอมเมนต์</div>41</div><div><div class="card-kicker">แชร์</div>88</div><div><div class="card-kicker">Engagement</div>6.9%</div></div>
+<div style="padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px"><div style="font:600 26px var(--font-heading)">YouTube</div><div><div class="card-kicker">วิว</div><div style="height:10px;background:var(--color-accent);width:32%"></div>15,300</div><div><div class="card-kicker">ไลก์</div>910</div><div><div class="card-kicker">คอมเมนต์</div>63</div><div><div class="card-kicker">แชร์</div>API ไม่ให้ข้อมูล</div><div><div class="card-kicker">Engagement</div>6.4%</div></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="9c"><div class="dv-olabel"><a class="dv-oid" href="#9c">9c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">สถิติ · 30 วัน</div></div>
+<div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:10px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="card"><span class="card-kicker">เผยแพร่</span><b style="font:600 26px var(--font-heading)">114</b></div><div class="card"><span class="card-kicker">สำเร็จ</span><b style="font:600 26px var(--font-heading)">97.4%</b></div></div>
+<div class="card"><span class="card-kicker">ยอดวิวรายวัน</span><div style="display:flex;align-items:flex-end;gap:4px;height:100px"><div style="flex:1;height:30%;background:var(--color-accent-300)"></div><div style="flex:1;height:45%;background:var(--color-accent-300)"></div><div style="flex:1;height:52%;background:var(--color-accent-300)"></div><div style="flex:1;height:60%;background:var(--color-accent-300)"></div><div style="flex:1;height:72%;background:var(--color-accent-300)"></div><div style="flex:1;height:88%;background:var(--color-accent)"></div></div></div>
+<table class="table" style="font-size:13px"><tbody><tr><td>TikTok</td><td>48.2K</td><td>7.7%</td></tr><tr><td>Instagram</td><td>21.9K</td><td>7.2%</td></tr><tr><td>Facebook</td><td>9.4K</td><td>6.9%</td></tr><tr><td>YouTube</td><td>15.3K</td><td>6.4%</td></tr></tbody></table>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="9d"><div class="dv-olabel"><a class="dv-oid" href="#9d">9d</a>มือถือ · แบบ B</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-size:20px">≡</span><b style="font:600 18px var(--font-heading)">สถิติ</b></div>
+<div style="padding:20px 16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">วิวรวม · 30 วัน</div><div style="font:600 56px/1 var(--font-heading)">94,800</div></div>
+<div style="padding:16px;display:flex;flex-direction:column;gap:14px;font-size:14px">
+<div><div style="display:flex;justify-content:space-between">TikTok<b>48,200</b></div><div style="height:6px;background:var(--color-accent);width:100%;margin-top:4px"></div></div>
+<div><div style="display:flex;justify-content:space-between">Instagram<b>21,900</b></div><div style="height:6px;background:var(--color-accent);width:45%;margin-top:4px"></div></div>
+<div><div style="display:flex;justify-content:space-between">YouTube<b>15,300</b></div><div style="height:6px;background:var(--color-accent);width:32%;margin-top:4px"></div></div>
+<div><div style="display:flex;justify-content:space-between">Facebook<b>9,400</b></div><div style="height:6px;background:var(--color-accent);width:20%;margin-top:4px"></div></div>
+</div>
+<div style="margin-top:auto;padding:16px;font-size:12px;color:var(--color-neutral-700)">แสดงเฉพาะค่าที่ API ของแพลตฟอร์มให้มา</div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t10">
+<div class="dv-thd"><span class="dv-tid">10</span><span class="dv-tname">บันทึกระบบ</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="10a"><div class="dv-olabel"><a class="dv-oid" href="#10a">10a</a>เดสก์ท็อป · ตาราง + ตัวกรอง</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">บันทึกระบบ</div><div style="padding:7px 8px">ตั้งค่า</div>
+</nav>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:14px;min-width:0">
+<h1 style="margin:0;font-size:28px">บันทึกระบบ</h1>
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px"><input class="input" value="30 ก.ย. 2569"><input class="input" placeholder="ระดับ: ทั้งหมด"><input class="input" placeholder="งาน"><input class="input" placeholder="คอนเทนต์"><input class="input" placeholder="แพลตฟอร์ม"><input class="input" placeholder="Request ID"></div>
+<table class="table" style="font:12px ui-monospace,monospace"><thead><tr><th>เวลา</th><th>ระดับ</th><th>งาน</th><th>คอนเทนต์</th><th>แพลตฟอร์ม</th><th>ข้อความ</th><th>Request ID</th></tr></thead><tbody>
+<tr style="background:var(--color-accent-100)"><td>09:21:03</td><td><b>ERROR</b></td><td>publish</td><td>#102</td><td>facebook</td><td>OAuth token expired (retry 3/3)</td><td>7f3a…c21</td></tr>
+<tr><td>09:02:18</td><td>INFO</td><td>publish</td><td>#102</td><td>youtube</td><td>Upload complete</td><td>a91b…04e</td></tr>
+<tr><td>09:01:14</td><td>WARNING</td><td>publish</td><td>#102</td><td>facebook</td><td>401 Unauthorized, scheduling retry</td><td>7f3a…c21</td></tr>
+<tr><td>09:01:02</td><td>INFO</td><td>publish</td><td>#102</td><td>instagram</td><td>Reel published</td><td>55cd…e10</td></tr>
+<tr><td>08:59:40</td><td>INFO</td><td>publish</td><td>#102</td><td>tiktok</td><td>Video published</td><td>c02e…7aa</td></tr>
+<tr><td>06:40:11</td><td>INFO</td><td>ffmpeg</td><td>#103</td><td>—</td><td>Render done 45s 1080x1920</td><td>1be4…993</td></tr>
+<tr><td>06:12:47</td><td>DEBUG</td><td>claude</td><td>#103</td><td>—</td><td>Tokens in 812 / out 1,406</td><td>e7f0…2d1</td></tr>
+<tr><td>06:00:00</td><td>INFO</td><td>scheduler</td><td>—</td><td>—</td><td>Daily run started</td><td>0000…001</td></tr>
+</tbody></table>
+</main>
+</div></div>
+
+<div class="dv-opt" id="10b"><div class="dv-olabel"><a class="dv-oid" href="#10b">10b</a>เดสก์ท็อป · เทอร์มินัล + รายละเอียด</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">บันทึก</span></header>
+<div style="padding:12px 24px;border-bottom:1px solid var(--color-divider);display:flex;gap:8px;align-items:center"><div class="seg"><span class="seg-opt">DEBUG</span><span class="seg-opt" style="background:var(--color-accent-100)">INFO</span><span class="seg-opt" style="background:var(--color-accent-100)">WARNING</span><span class="seg-opt" style="background:var(--color-accent-100)">ERROR</span></div><input class="input" style="flex:1" placeholder="ค้นหา: content:102 platform:facebook"></div>
+<div style="flex:1;display:grid;grid-template-columns:1fr 380px;min-height:0">
+<div style="padding:16px 24px;font:13px/1.9 ui-monospace,monospace;border-right:1px solid var(--color-divider);background:var(--color-neutral-100)">
+<div style="background:var(--color-accent-200);margin:0 -8px;padding:0 8px">09:21:03 ERROR   publish  #102 facebook  OAuth token expired</div>
+<div>09:02:18 INFO    publish  #102 youtube   Upload complete</div>
+<div>09:01:14 WARNING publish  #102 facebook  401, retry in 10m</div>
+<div>09:01:02 INFO    publish  #102 instagram Reel published</div>
+<div>08:59:40 INFO    publish  #102 tiktok    Video published</div>
+<div>06:40:11 INFO    ffmpeg   #103           Render done</div>
+<div>06:15:02 INFO    tts      #103           Audio 44.8s</div>
+<div>06:00:00 INFO    scheduler               Daily run started</div>
+</div>
+<div style="padding:20px;display:flex;flex-direction:column;gap:12px;font-size:13px"><div class="card-kicker">รายละเอียด</div><div style="font:600 24px var(--font-heading)">ERROR · publish</div><div><div class="card-kicker">Request ID</div><span style="font-family:ui-monospace,monospace">7f3a91e0-…-c21</span></div><div><div class="card-kicker">คอนเทนต์</div>#102 5 วิธีออมเงิน</div><div><div class="card-kicker">ข้อความ</div>OAuth token expired. Retry 3/3 exhausted.</div><div style="margin-top:auto;display:flex;gap:6px"><button class="btn btn-secondary">เปิดคอนเทนต์</button><button class="btn btn-secondary">คัดลอก JSON</button></div></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="10c"><div class="dv-olabel"><a class="dv-oid" href="#10c">10c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">บันทึกระบบ</div></div>
+<div style="padding:10px 14px;display:flex;gap:6px"><span class="tag tag-accent">ทุกระดับ</span><span class="tag tag-neutral">ERROR</span><span class="tag tag-neutral">วันนี้</span><span class="tag tag-neutral">+ ตัวกรอง</span></div>
+<div style="flex:1;font-size:13px">
+<div style="padding:12px 14px;border-top:1px solid var(--color-divider);background:var(--color-accent-100)"><div class="card-kicker">09:21 · ERROR · facebook</div>#102 OAuth token expired</div>
+<div style="padding:12px 14px;border-top:1px solid var(--color-divider)"><div class="card-kicker">09:02 · INFO · youtube</div>#102 Upload complete</div>
+<div style="padding:12px 14px;border-top:1px solid var(--color-divider)"><div class="card-kicker">09:01 · WARNING · facebook</div>#102 401, retry in 10m</div>
+<div style="padding:12px 14px;border-top:1px solid var(--color-divider)"><div class="card-kicker">09:01 · INFO · instagram</div>#102 Reel published</div>
+<div style="padding:12px 14px;border-top:1px solid var(--color-divider)"><div class="card-kicker">06:40 · INFO · ffmpeg</div>#103 Render done</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="10d"><div class="dv-olabel"><a class="dv-oid" href="#10d">10d</a>มือถือ · แบบ B</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-size:20px">≡</span><b style="font:600 18px var(--font-heading)">บันทึกระบบ</b></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--color-divider);text-align:center"><div style="padding:12px 0;border-right:1px solid var(--color-divider)"><div style="font:600 22px var(--font-heading)">12</div><span style="font-size:10px">DEBUG</span></div><div style="padding:12px 0;border-right:1px solid var(--color-divider)"><div style="font:600 22px var(--font-heading)">41</div><span style="font-size:10px">INFO</span></div><div style="padding:12px 0;border-right:1px solid var(--color-divider)"><div style="font:600 22px var(--font-heading)">2</div><span style="font-size:10px">WARNING</span></div><div style="padding:12px 0;background:var(--color-accent-100)"><div style="font:600 22px var(--font-heading)">1</div><span style="font-size:10px">ERROR</span></div></div>
+<div style="flex:1;padding:14px 16px;font:12px/1.9 ui-monospace,monospace;background:var(--color-neutral-100)"><div style="color:var(--color-accent-800)">09:21 ERR  #102 fb token expired</div><div>09:02 INF  #102 yt upload ok</div><div>09:01 WRN  #102 fb 401 retry</div><div>09:01 INF  #102 ig reel ok</div><div>08:59 INF  #102 tt video ok</div><div>06:40 INF  #103 ffmpeg done</div></div>
+</div></div>
+</div>
+</section>
+
+<section class="dv-turn" id="t11">
+<div class="dv-thd"><span class="dv-tid">11</span><span class="dv-tname">ตั้งค่า</span></div>
+<div class="dv-opts">
+<div class="dv-opt" id="11a"><div class="dv-olabel"><a class="dv-oid" href="#11a">11a</a>เดสก์ท็อป · เมนูหมวดย่อย</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex">
+<nav style="width:196px;flex:none;border-right:1px solid var(--color-divider);padding:16px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px">
+<div style="font:600 19px var(--font-heading);padding:4px 8px 16px;letter-spacing:.04em">SOCIAL / AUTO</div>
+<div style="padding:7px 8px">แดชบอร์ด</div><div style="padding:7px 8px">คอนเทนต์</div><div style="padding:7px 8px">AI สร้างคอนเทนต์</div><div style="padding:7px 8px">สตูดิโอวิดีโอ</div><div style="padding:7px 8px">ปฏิทิน</div><div style="padding:7px 8px">ระบบอัตโนมัติ</div><div style="padding:7px 8px">บัญชีโซเชียล</div><div style="padding:7px 8px">การเผยแพร่</div><div style="padding:7px 8px">สถิติ</div><div style="padding:7px 8px">บันทึกระบบ</div><div style="padding:7px 8px;background:var(--color-accent-100);color:var(--color-accent-800)">ตั้งค่า</div>
+</nav>
+<div style="width:180px;flex:none;border-right:1px solid var(--color-divider);padding:24px 12px;display:flex;flex-direction:column;gap:2px;font-size:13px"><div style="padding:7px 8px">ทั่วไป</div><div style="padding:7px 8px;border-left:2px solid var(--color-accent);color:var(--color-accent-800)">AI</div><div style="padding:7px 8px">วิดีโอ</div><div style="padding:7px 8px">พื้นที่จัดเก็บ</div><div style="padding:7px 8px">โซเชียล</div><div style="padding:7px 8px">อัตโนมัติ</div><div style="padding:7px 8px">ความปลอดภัย</div><div style="padding:7px 8px">การแจ้งเตือน</div></div>
+<main style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:16px;max-width:560px">
+<h1 style="margin:0;font-size:28px">AI</h1>
+<div class="field"><label>Anthropic API key</label><input class="input" value="sk-ant-••••••••••••3f9a"></div>
+<div style="font-size:12px;color:var(--color-neutral-700);margin-top:-8px">แยกจากบัญชี Claude Pro · ใช้เครดิต API เท่านั้น</div>
+<div class="field"><label>โมเดล</label><input class="input" value="claude-sonnet"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="field"><label>ภาษาเริ่มต้น</label><input class="input" value="ไทย"></div><div class="field"><label>โทนเริ่มต้น</label><input class="input" value="เป็นกันเอง"></div></div>
+<div class="field"><label>งบประมาณต่อเดือน (USD)</label><input class="input" value="20"></div>
+<div style="display:flex;gap:8px"><button class="btn btn-primary">บันทึก</button><button class="btn btn-secondary">ทดสอบการเชื่อมต่อ</button></div>
+</main>
+</div></div>
+
+<div class="dv-opt" id="11b"><div class="dv-olabel"><a class="dv-oid" href="#11b">11b</a>เดสก์ท็อป · ภาพรวมทุกหมวด</div>
+<div class="dv-card" style="width:1180px;height:740px;display:flex;flex-direction:column">
+<header class="nav" style="border-bottom:1px solid var(--color-divider);font-size:13px;gap:20px"><span class="nav-brand">SOCIAL / AUTO</span><span>แดชบอร์ด</span><span>คอนเทนต์</span><span>AI</span><span>วิดีโอ</span><span>ปฏิทิน</span><span>เผยแพร่</span><span>สถิติ</span><span style="color:var(--color-accent-800);border-bottom:2px solid var(--color-accent);padding-bottom:4px">ตั้งค่า</span></header>
+<div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr">
+<div style="padding:24px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px;font-size:13px"><div class="card-kicker">01</div><div style="font:600 26px var(--font-heading)">ทั่วไป</div><div>ชื่อระบบ · Asia/Bangkok · ภาษา UI ไทย</div><button class="btn btn-ghost" style="margin-top:auto;align-self:flex-start">แก้ไข →</button></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px;font-size:13px"><div class="card-kicker">02</div><div style="font:600 26px var(--font-heading)">AI</div><div>Anthropic API · claude-sonnet · งบ $20/เดือน</div><button class="btn btn-ghost" style="margin-top:auto;align-self:flex-start">แก้ไข →</button></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px;font-size:13px"><div class="card-kicker">03</div><div style="font:600 26px var(--font-heading)">วิดีโอ</div><div>1080×1920 · 30fps · TTS ภายนอก · ซับฝังในวิดีโอ</div><button class="btn btn-ghost" style="margin-top:auto;align-self:flex-start">แก้ไข →</button></div>
+<div style="padding:24px;border-bottom:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px;font-size:13px"><div class="card-kicker">04</div><div style="font:600 26px var(--font-heading)">พื้นที่จัดเก็บ</div><div>/data/media · ใช้ 3.2 / 20 GB</div><button class="btn btn-ghost" style="margin-top:auto;align-self:flex-start">แก้ไข →</button></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px;font-size:13px"><div class="card-kicker">05</div><div style="font:600 26px var(--font-heading)">โซเชียล</div><div>4 แอป OAuth · 1 ต้องเชื่อมต่อใหม่</div><button class="btn btn-ghost" style="margin-top:auto;align-self:flex-start">แก้ไข →</button></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px;font-size:13px"><div class="card-kicker">06</div><div style="font:600 26px var(--font-heading)">อัตโนมัติ</div><div>1/วัน · 09:00 · ลองใหม่ 3 ครั้ง</div><button class="btn btn-ghost" style="margin-top:auto;align-self:flex-start">แก้ไข →</button></div>
+<div style="padding:24px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:8px;font-size:13px"><div class="card-kicker">07</div><div style="font:600 26px var(--font-heading)">ความปลอดภัย</div><div>ผู้ดูแล 1 คน · 2FA เปิด · เข้ารหัส token</div><button class="btn btn-ghost" style="margin-top:auto;align-self:flex-start">แก้ไข →</button></div>
+<div style="padding:24px;display:flex;flex-direction:column;gap:8px;font-size:13px"><div class="card-kicker">08</div><div style="font:600 26px var(--font-heading)">การแจ้งเตือน</div><div>อีเมลเมื่อ ERROR · สรุปรายวัน 21:00</div><button class="btn btn-ghost" style="margin-top:auto;align-self:flex-start">แก้ไข →</button></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="11c"><div class="dv-olabel"><a class="dv-oid" href="#11c">11c</a>มือถือ · แบบ A</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div style="font:600 24px var(--font-heading)">ตั้งค่า</div></div>
+<div style="flex:1;font-size:15px">
+<div style="display:flex;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--color-divider)">ทั่วไป<span>›</span></div><div style="display:flex;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--color-divider)">AI<span>›</span></div><div style="display:flex;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--color-divider)">วิดีโอ<span>›</span></div><div style="display:flex;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--color-divider)">พื้นที่จัดเก็บ<span>›</span></div><div style="display:flex;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--color-divider)">โซเชียล<span>›</span></div><div style="display:flex;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--color-divider)">อัตโนมัติ<span>›</span></div><div style="display:flex;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--color-divider)">ความปลอดภัย<span>›</span></div><div style="display:flex;justify-content:space-between;padding:15px 16px;border-bottom:1px solid var(--color-divider)">การแจ้งเตือน<span>›</span></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--color-divider);font-size:11px;text-align:center"><div style="padding:14px 0">หน้าหลัก</div><div style="padding:14px 0">คอนเทนต์</div><div style="padding:14px 0">ปฏิทิน</div><div style="padding:14px 0">เผยแพร่</div><div style="padding:14px 0;color:var(--color-accent-800);background:var(--color-accent-100)">เมนู</div></div>
+</div></div>
+
+<div class="dv-opt" id="11d"><div class="dv-olabel"><a class="dv-oid" href="#11d">11d</a>มือถือ · แบบ B</div>
+<div class="dv-card" style="width:360px;height:720px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--color-divider)"><span style="font-size:20px">≡</span><b style="font:600 18px var(--font-heading)">ตั้งค่า</b></div>
+<div style="display:grid;grid-template-columns:1fr 1fr">
+<div style="padding:16px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);min-height:96px"><div class="card-kicker">01</div><div style="font:600 20px var(--font-heading)">ทั่วไป</div></div>
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">02</div><div style="font:600 20px var(--font-heading)">AI</div></div>
+<div style="padding:16px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);min-height:96px"><div class="card-kicker">03</div><div style="font:600 20px var(--font-heading)">วิดีโอ</div></div>
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">04</div><div style="font:600 20px var(--font-heading)">พื้นที่จัดเก็บ</div></div>
+<div style="padding:16px;border-right:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);min-height:96px;background:var(--color-accent-100)"><div class="card-kicker">05 · 1 แจ้งเตือน</div><div style="font:600 20px var(--font-heading)">โซเชียล</div></div>
+<div style="padding:16px;border-bottom:1px solid var(--color-divider)"><div class="card-kicker">06</div><div style="font:600 20px var(--font-heading)">อัตโนมัติ</div></div>
+<div style="padding:16px;border-right:1px solid var(--color-divider);min-height:96px"><div class="card-kicker">07</div><div style="font:600 20px var(--font-heading)">ความปลอดภัย</div></div>
+<div style="padding:16px"><div class="card-kicker">08</div><div style="font:600 20px var(--font-heading)">การแจ้งเตือน</div></div>
+</div>
+</div></div>
+</div>
+<p class="dv-next">ลองต่อ: "ใช้เมนูแบบ A กับกริดแบบ B" · "ทำ 3b ให้เป็นโปรโตไทป์คลิกได้" · "เพิ่มโหมดมืด"</p>
+</section>
+</x-dc>
+</body>
+</html>

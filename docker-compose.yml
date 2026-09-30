@@ -1,0 +1,94 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ai_social}
+      POSTGRES_USER: ${POSTGRES_USER:-ai_social}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/02-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ai_social} -d ${POSTGRES_DB:-ai_social}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    mem_limit: 450m
+    cpus: 0.35
+    networks: [internal]
+
+  app:
+    build: .
+    image: ai-social-app:latest
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Built from POSTGRES_* so .env can leave DATABASE_URL empty for local `npm run dev`.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ai_social}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-ai_social}
+      DB_POOL_MAX: ${DB_POOL_MAX:-5}
+      MEDIA_ROOT: /data/media
+      # The image ships Noto Sans Thai; ignore a Windows font name from a local .env.
+      SUBTITLE_FONT: Noto Sans Thai
+    volumes:
+      - media_data:/data/media
+    # Localhost only. Nginx on the host terminates HTTPS and proxies here.
+    ports:
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # FFmpeg renders 1080x1920 here, so the app gets more headroom than n8n.
+    mem_limit: 650m
+    cpus: 0.8
+    networks: [internal]
+
+  n8n:
+    image: n8nio/n8n:${N8N_VERSION:-latest}
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: ${POSTGRES_DB:-ai_social}
+      DB_POSTGRESDB_USER: ${POSTGRES_USER:-ai_social}
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_POSTGRESDB_SCHEMA: ${N8N_DB_SCHEMA:-n8n}
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
+      N8N_EDITOR_BASE_URL: ${N8N_EDITOR_BASE_URL:-}
+      WEBHOOK_URL: ${N8N_EDITOR_BASE_URL:-}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?Set N8N_ENCRYPTION_KEY in .env}
+      N8N_SECURE_COOKIE: ${N8N_SECURE_COOKIE:-false}
+      GENERIC_TIMEZONE: ${TIMEZONE:-Asia/Bangkok}
+      TZ: ${TIMEZONE:-Asia/Bangkok}
+      EXECUTIONS_CONCURRENCY_PRODUCTION_LIMIT: 1
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      # The workflow reads AUTOMATION_TOKEN from the environment.
+      AUTOMATION_TOKEN: ${AUTOMATION_TOKEN:?Set AUTOMATION_TOKEN in .env}
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/workflows:ro
+    ports:
+      - "127.0.0.1:${N8N_PORT_HOST:-5678}:5678"
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 550m
+    cpus: 0.35
+    networks: [internal]
+
+volumes:
+  postgres_data:
+  n8n_data:
+  media_data:
+
+networks:
+  internal:
+    driver: bridge
