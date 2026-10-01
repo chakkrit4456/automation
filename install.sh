@@ -73,7 +73,7 @@ env_secret() {
 }
 
 # ---------- ตรวจสอบเบื้องต้น ----------
-[[ $EUID -eq 0 ]] || die "กรุณารันด้วย root (sudo bash install.sh)"
+[[ $EUID -eq 0 ]] || die "กรุณารันด้วย root (bash install.sh)"
 [[ -f "$SRC_DIR/backend/server.js" && -f "$SRC_DIR/database/schema.sql" ]] \
   || die "ให้วาง install.sh ไว้ที่โฟลเดอร์รากของโปรเจค (ที่มี backend/ frontend/ database/)"
 . /etc/os-release
@@ -140,9 +140,9 @@ ok "โค้ดอยู่ที่ $APP_DIR"
 # ---------- 4. edge-tts (Python venv) ----------
 step "4/9 ติดตั้ง edge-tts (เสียงพากย์ไทยฟรี)"
 if [[ ! -x "$APP_DIR/.venv/bin/edge-tts" ]]; then
-  sudo -u "$APP_USER" python3 -m venv "$APP_DIR/.venv"
+  runuser -u "$APP_USER" -- python3 -m venv "$APP_DIR/.venv"
 fi
-sudo -u "$APP_USER" "$APP_DIR/.venv/bin/pip" install --quiet --upgrade pip edge-tts
+runuser -u "$APP_USER" -- "$APP_DIR/.venv/bin/pip" install --quiet --upgrade pip edge-tts
 ln -sf "$APP_DIR/.venv/bin/edge-tts" /usr/local/bin/edge-tts
 ok "edge-tts $("$APP_DIR/.venv/bin/edge-tts" --version 2>/dev/null | head -1 || echo installed)"
 
@@ -185,8 +185,8 @@ ok ".env พร้อม (PUBLIC_URL=$PUBLIC_URL)"
 # ---------- 6. PostgreSQL ----------
 step "6/9 ตั้งค่า PostgreSQL"
 systemctl enable --now postgresql
-for i in {1..20}; do sudo -u postgres pg_isready -q && break; sleep 1; done
-sudo -u postgres psql -v ON_ERROR_STOP=1 -q <<SQL
+for i in {1..20}; do runuser -u postgres -- pg_isready -q && break; sleep 1; done
+runuser -u postgres -- psql -v ON_ERROR_STOP=1 -q <<SQL
 DO \$\$ BEGIN
   IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '${DB_USER}') THEN
     CREATE ROLE ${DB_USER} LOGIN PASSWORD '${DB_PASS}';
@@ -195,9 +195,9 @@ DO \$\$ BEGIN
   END IF;
 END \$\$;
 SQL
-sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'" | grep -q 1 \
-  || sudo -u postgres createdb -O "$DB_USER" -E UTF8 -T template0 "$DB_NAME"
-sudo -u postgres psql -v ON_ERROR_STOP=1 -q -d "$DB_NAME" <<SQL
+runuser -u postgres -- psql -tAc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'" | grep -q 1 \
+  || runuser -u postgres -- createdb -O "$DB_USER" -E UTF8 -T template0 "$DB_NAME"
+runuser -u postgres -- psql -v ON_ERROR_STOP=1 -q -d "$DB_NAME" <<SQL
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE SCHEMA IF NOT EXISTS n8n AUTHORIZATION ${DB_USER};
 ALTER SCHEMA public OWNER TO ${DB_USER};
@@ -208,10 +208,10 @@ ok "ฐานข้อมูล ${DB_NAME} พร้อม (ตาราง/ mig
 # ---------- 7. build แอป ----------
 step "7/9 ติดตั้ง dependencies และ build frontend"
 cd "$APP_DIR/frontend"
-sudo -u "$APP_USER" -H npm ci --no-audit --no-fund
-sudo -u "$APP_USER" -H npm run build
+runuser -u "$APP_USER" -- npm ci --no-audit --no-fund
+runuser -u "$APP_USER" -- npm run build
 cd "$APP_DIR/backend"
-sudo -u "$APP_USER" -H npm ci --omit=dev --no-audit --no-fund
+runuser -u "$APP_USER" -- npm ci --omit=dev --no-audit --no-fund
 ok "build สำเร็จ"
 
 # ---------- 8. systemd services ----------
