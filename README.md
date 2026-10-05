@@ -14,7 +14,15 @@ Without a `.env` in development, the defaults are `admin@localhost` / `changeme`
 
 Without `DATABASE_URL`, the API keeps state in memory and loads sample content.
 
-## Run the full stack (same as production)
+## Deploy to the server (no Docker) — automation.itdev.in.th
+
+```bash
+bash install.sh   # as root on Debian 12 over SSH; DOMAIN=automation.itdev.in.th, uses your existing Cloudflare tunnel (no token needed)
+```
+
+Installs everything, plus swap, firewall, daily backups and a health check. Full steps: `docs/14-ขึ้นใช้งานจริง.md`. How to get the YouTube / Meta / TikTok keys: `docs/15-ขอคีย์โซเชียล.md`.
+
+## Run the full stack with Docker (alternative)
 
 ```bash
 node scripts/make-env.js              # then edit PUBLIC_URL, ANTHROPIC_API_KEY, OAuth ids

@@ -12,17 +12,27 @@
 #     DOMAIN=app.example.com N8N_DOMAIN=n8n.example.com LE_EMAIL=me@example.com bash install.sh
 #
 #  ตัวแปรที่ปรับได้ (ไม่ใส่ก็ได้):
-#     DOMAIN        โดเมนของหน้า dashboard (ไม่ใส่ = ใช้ IP ของเครื่อง, http)
+#     DOMAIN        โดเมนของหน้า dashboard (ค่าเริ่มต้น automation.itdev.in.th)
 #     N8N_DOMAIN    โดเมนของ n8n (ไม่ใส่ = n8n ฟังเฉพาะ 127.0.0.1:5678)
 #     LE_EMAIL      อีเมลสำหรับ Let's Encrypt (ต้องมีพร้อม DOMAIN จึงจะขอ HTTPS)
 #     INSTALL_N8N   yes/no  (ค่าเริ่มต้น yes)
 #     APP_DIR       ที่ติดตั้ง (ค่าเริ่มต้น /opt/ai-social)
 #     APP_PORT      พอร์ตภายในของแอป (ค่าเริ่มต้น 3000)
 #     CF_TUNNEL     yes = อยู่หลัง Cloudflare Tunnel (HTTPS จัดการโดย Cloudflare, ไม่ใช้ certbot)
-#     CF_TUNNEL_TOKEN  token ของ tunnel (ถ้าใส่ จะติดตั้ง cloudflared เป็น service ให้)
+#                   ค่าเริ่มต้น = existing (ใช้ tunnel เดิมที่ route มาที่ IP เครื่องนี้ ไม่ติดตั้ง cloudflared)
+#                   yes = ติดตั้ง cloudflared บนเครื่องนี้, no = ไม่ใช้ Cloudflare
+#     CF_TUNNEL_TOKEN  (ไม่บังคับ) token ของ tunnel ที่สร้างไว้ใน Dashboard ถ้าไม่ใส่ สคริปต์จะให้ล็อกอิน
+#                   Cloudflare ผ่านเบราว์เซอร์ครั้งเดียว แล้วสร้าง tunnel + DNS ให้อัตโนมัติ
+#     CF_TUNNEL_NAME   ชื่อ tunnel ที่จะสร้าง (ค่าเริ่มต้น ai-social)
+#
+#     ALERT_WEBHOOK_URL  Discord/Slack webhook สำหรับแจ้งเตือนเมื่อแอปล่ม/สำรองข้อมูลล้มเหลว (ไม่ใส่ก็ได้)
+#     ENABLE_UFW    yes/no  เปิด firewall (ค่าเริ่มต้น yes; ข้ามเองถ้าหาพอร์ต SSH ไม่เจอ)
+#     SWAP_MB       ขนาด swap ที่จะสร้างถ้าเครื่อง RAM <= 3GB และยังไม่มี swap (ค่าเริ่มต้น 2048)
+#     BACKUP_MEDIA  yes = สำรองโฟลเดอร์วิดีโอด้วย (ค่าเริ่มต้น no เพราะไฟล์ใหญ่)
 #
 #  ตัวอย่าง Cloudflare Tunnel:
-#     CF_TUNNEL=yes DOMAIN=automation.itdev.in.th CF_TUNNEL_TOKEN=eyJ... bash install.sh
+#     bash install.sh                      # ใช้ค่าเริ่มต้น (automation.itdev.in.th) ไม่ต้องมี token
+#     CF_TUNNEL_TOKEN=eyJ... bash install.sh   # ถ้ามี token อยู่แล้ว
 #
 #  รันซ้ำได้เพื่ออัปเดตโค้ด: .env และฐานข้อมูลเดิมจะถูกเก็บไว้
 # =============================================================================
@@ -34,12 +44,20 @@ APP_USER="aisocial"
 APP_DIR="${APP_DIR:-/opt/ai-social}"
 APP_PORT="${APP_PORT:-3000}"
 N8N_PORT="${N8N_PORT:-5678}"
-DOMAIN="${DOMAIN:-}"
+DOMAIN="${DOMAIN:-automation.itdev.in.th}"
 N8N_DOMAIN="${N8N_DOMAIN:-}"
 LE_EMAIL="${LE_EMAIL:-}"
 INSTALL_N8N="${INSTALL_N8N:-yes}"
 CF_TUNNEL_TOKEN="${CF_TUNNEL_TOKEN:-}"
-CF_TUNNEL="${CF_TUNNEL:-$([[ -n "$CF_TUNNEL_TOKEN" ]] && echo yes || echo no)}"
+# CF_TUNNEL: existing = มี tunnel อยู่แล้วที่เครื่องอื่น/Dashboard ชี้มาที่เครื่องนี้ (ค่าเริ่มต้น, ไม่ติดตั้ง cloudflared)
+#            yes      = ติดตั้ง cloudflared บนเครื่องนี้ (ใช้ token หรือล็อกอินผ่านเบราว์เซอร์)
+#            no       = ไม่ใช้ Cloudflare (ใช้ certbot ถ้าใส่ LE_EMAIL)
+CF_TUNNEL="${CF_TUNNEL:-$([[ -n "$CF_TUNNEL_TOKEN" ]] && echo yes || { [[ -n "$LE_EMAIL" ]] && echo no || echo existing; })}"
+BEHIND_CF=$([[ "$CF_TUNNEL" == yes || "$CF_TUNNEL" == existing ]] && echo yes || echo no)
+ALERT_WEBHOOK_URL="${ALERT_WEBHOOK_URL:-}"
+ENABLE_UFW="${ENABLE_UFW:-yes}"
+SWAP_MB="${SWAP_MB:-2048}"
+BACKUP_MEDIA="${BACKUP_MEDIA:-no}"
 NODE_MAJOR=22
 DB_NAME="ai_social"
 DB_USER="ai_social"
@@ -89,7 +107,7 @@ echo " Domain : ${DOMAIN:-<ใช้ IP>}   n8n: ${N8N_DOMAIN:-<localhost only>}
 echo "============================================================"
 
 # ---------- 1. แพ็กเกจระบบ ----------
-step "1/9 ติดตั้งแพ็กเกจระบบ"
+step "1/10 ติดตั้งแพ็กเกจระบบ"
 apt-get update -y
 apt-get install -y --no-install-recommends \
   ca-certificates curl gnupg openssl rsync git build-essential \
@@ -101,7 +119,7 @@ fc-cache -f >/dev/null || true
 ok "แพ็กเกจระบบพร้อม"
 
 # ---------- 2. Node.js 22 (TurnKey มาพร้อม 18 แต่ backend ต้องการ >=22.9) ----------
-step "2/9 ติดตั้ง Node.js ${NODE_MAJOR}"
+step "2/10 ติดตั้ง Node.js ${NODE_MAJOR}"
 cur_major="$(node -v 2>/dev/null | sed -E 's/^v([0-9]+).*/\1/' || echo 0)"
 if [[ "${cur_major:-0}" -lt "$NODE_MAJOR" ]]; then
   warn "พบ Node $(node -v 2>/dev/null || echo 'none') — อัปเกรดเป็น ${NODE_MAJOR}.x จาก NodeSource"
@@ -125,7 +143,7 @@ node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a
 ok "Node $(node -v), npm $(npm -v)"
 
 # ---------- 3. ผู้ใช้ระบบ + คัดลอกโค้ด ----------
-step "3/9 สร้างผู้ใช้ '$APP_USER' และคัดลอกโค้ดไป $APP_DIR"
+step "3/10 สร้างผู้ใช้ '$APP_USER' และคัดลอกโค้ดไป $APP_DIR"
 id "$APP_USER" &>/dev/null || useradd --system --create-home --home-dir "/home/$APP_USER" --shell /usr/sbin/nologin "$APP_USER"
 install -d -o "$APP_USER" -g "$APP_USER" "$APP_DIR" /var/lib/$APP_NAME/media
 if [[ "$SRC_DIR" != "$APP_DIR" ]]; then
@@ -138,7 +156,7 @@ chown -R "$APP_USER:$APP_USER" "$APP_DIR"
 ok "โค้ดอยู่ที่ $APP_DIR"
 
 # ---------- 4. edge-tts (Python venv) ----------
-step "4/9 ติดตั้ง edge-tts (เสียงพากย์ไทยฟรี)"
+step "4/10 ติดตั้ง edge-tts (เสียงพากย์ไทยฟรี)"
 if [[ ! -x "$APP_DIR/.venv/bin/edge-tts" ]]; then
   runuser -u "$APP_USER" -- python3 -m venv "$APP_DIR/.venv"
 fi
@@ -147,8 +165,10 @@ ln -sf "$APP_DIR/.venv/bin/edge-tts" /usr/local/bin/edge-tts
 ok "edge-tts $("$APP_DIR/.venv/bin/edge-tts" --version 2>/dev/null | head -1 || echo installed)"
 
 # ---------- 5. ไฟล์ .env ----------
-step "5/9 เตรียมไฟล์ .env"
+step "5/10 เตรียมไฟล์ .env"
+FRESH_ENV=0
 if [[ ! -f "$ENV_FILE" ]]; then
+  FRESH_ENV=1
   if [[ -f "$SRC_DIR/.env" ]]; then
     cp "$SRC_DIR/.env" "$ENV_FILE"; ok "ใช้ .env จากโฟลเดอร์โปรเจค"
   else
@@ -160,13 +180,14 @@ for k in APP_SECRET ADMIN_PASSWORD AUTOMATION_TOKEN POSTGRES_PASSWORD N8N_ENCRYP
 
 SERVER_IP="$(hostname -I | awk '{print $1}')"
 if [[ -n "$DOMAIN" ]]; then
-  if [[ "$CF_TUNNEL" == yes || -n "$LE_EMAIL" ]]; then PUBLIC_URL="https://$DOMAIN"; else PUBLIC_URL="http://$DOMAIN"; fi
+  if [[ "$BEHIND_CF" == yes || -n "$LE_EMAIL" ]]; then PUBLIC_URL="https://$DOMAIN"; else PUBLIC_URL="http://$DOMAIN"; fi
 else
   PUBLIC_URL="http://$SERVER_IP"
 fi
 DB_PASS="$(env_get POSTGRES_PASSWORD)"
 
 env_set NODE_ENV production
+env_set TIMEZONE "$(env_get TIMEZONE | grep . || echo Asia/Bangkok)"
 env_set PORT "$APP_PORT"
 env_set PUBLIC_URL "$PUBLIC_URL"
 env_set POSTGRES_DB "$DB_NAME"
@@ -179,11 +200,13 @@ env_set STATIC_DIR "$APP_DIR/frontend/dist"
 [[ -z "$(env_get TIMEZONE)" ]] && env_set TIMEZONE "Asia/Bangkok"
 [[ -z "$(env_get PUBLISHER_MODE)" ]] && env_set PUBLISHER_MODE mock
 [[ -z "$(env_get SEED_DEMO)" ]] && env_set SEED_DEMO false
+# ติดตั้งครั้งแรก: .env อาจมาจากเครื่องพัฒนา ห้ามเอาข้อมูลตัวอย่างขึ้นระบบจริง
+[[ "$FRESH_ENV" == 1 ]] && env_set SEED_DEMO false
 chown "$APP_USER:$APP_USER" "$ENV_FILE"; chmod 600 "$ENV_FILE"
 ok ".env พร้อม (PUBLIC_URL=$PUBLIC_URL)"
 
 # ---------- 6. PostgreSQL ----------
-step "6/9 ตั้งค่า PostgreSQL"
+step "6/10 ตั้งค่า PostgreSQL"
 systemctl enable --now postgresql
 for i in {1..20}; do runuser -u postgres -- pg_isready -q && break; sleep 1; done
 runuser -u postgres -- psql -v ON_ERROR_STOP=1 -q <<SQL
@@ -206,7 +229,7 @@ SQL
 ok "ฐานข้อมูล ${DB_NAME} พร้อม (ตาราง/ migration จะสร้างอัตโนมัติตอนแอปเริ่ม)"
 
 # ---------- 7. build แอป ----------
-step "7/9 ติดตั้ง dependencies และ build frontend"
+step "7/10 ติดตั้ง dependencies และ build frontend"
 cd "$APP_DIR/frontend"
 runuser -u "$APP_USER" -- npm ci --no-audit --no-fund
 runuser -u "$APP_USER" -- npm run build
@@ -215,7 +238,7 @@ runuser -u "$APP_USER" -- npm ci --omit=dev --no-audit --no-fund
 ok "build สำเร็จ"
 
 # ---------- 8. systemd services ----------
-step "8/9 สร้าง systemd services"
+step "8/10 สร้าง systemd services"
 cat > /etc/systemd/system/${APP_NAME}.service <<EOF
 [Unit]
 Description=AI Social Automation (API + Dashboard)
@@ -246,7 +269,7 @@ if [[ "$INSTALL_N8N" == "yes" ]]; then
   if ! command -v n8n >/dev/null; then npm install -g n8n --no-audit --no-fund; fi
   install -d -o "$APP_USER" -g "$APP_USER" /var/lib/n8n
   if [[ -n "$N8N_DOMAIN" ]]; then
-    N8N_PROTO=$([[ -n "$LE_EMAIL" || "$CF_TUNNEL" == yes ]] && echo https || echo http)
+    N8N_PROTO=$([[ -n "$LE_EMAIL" || "$BEHIND_CF" == yes ]] && echo https || echo http)
     N8N_BASE="${N8N_PROTO}://${N8N_DOMAIN}/"; N8N_HOSTNAME="$N8N_DOMAIN"
     N8N_SECURE=$([[ "$N8N_PROTO" == https ]] && echo true || echo false)
   else
@@ -310,7 +333,7 @@ for i in {1..45}; do
 done
 
 # ---------- 9. Nginx + HTTPS ----------
-step "9/9 ตั้งค่า Nginx"
+step "9/10 ตั้งค่า Nginx"
 # ปิด site เดิมของ TurnKey (สำรองไว้ใน /etc/nginx/sites-disabled-turnkey)
 install -d /etc/nginx/sites-disabled-turnkey
 for f in /etc/nginx/sites-enabled/*; do
@@ -319,8 +342,8 @@ done
 
 APP_SERVER_NAME="${DOMAIN:-_}"
 # หลัง Cloudflare Tunnel ผู้ใช้เข้ามาด้วย https เสมอ
-if [[ "$CF_TUNNEL" == yes ]]; then FWD_PROTO='https'; APP_SERVER_NAME="${DOMAIN:+$DOMAIN }_"; LISTEN_OPTS=" default_server"; else FWD_PROTO='$scheme'; fi
-[[ "$CF_TUNNEL" == yes ]] || LISTEN_OPTS=$([[ -z "$DOMAIN" ]] && echo " default_server" || echo "")
+if [[ "$BEHIND_CF" == yes ]]; then FWD_PROTO='https'; APP_SERVER_NAME="${DOMAIN:+$DOMAIN }_"; LISTEN_OPTS=" default_server"; else FWD_PROTO='$scheme'; fi
+[[ "$BEHIND_CF" == yes ]] || LISTEN_OPTS=$([[ -z "$DOMAIN" ]] && echo " default_server" || echo "")
 cat > /etc/nginx/sites-available/${APP_NAME} <<EOF
 # สร้างโดย install.sh
 server {
@@ -370,22 +393,80 @@ systemctl enable nginx >/dev/null
 systemctl reload nginx || systemctl restart nginx
 ok "Nginx พร้อม"
 
-if [[ "$CF_TUNNEL" == yes ]]; then
+if [[ "$CF_TUNNEL" == existing ]]; then
+  step "   Cloudflare Tunnel (ใช้ tunnel เดิมที่ตั้งไว้แล้ว)"
+  ok "ไม่ติดตั้ง cloudflared บนเครื่องนี้ — ใน Cloudflare ให้ route ${DOMAIN} → http://${SERVER_IP} (พอร์ต 80)"
+  if curl -fsS -m 5 -H "Host: ${DOMAIN}" "http://127.0.0.1/api/health" >/dev/null 2>&1; then
+    ok "Nginx ตอบ Host ${DOMAIN} ได้ถูกต้อง"
+  else
+    warn "ทดสอบ Nginx ด้วย Host ${DOMAIN} ไม่ผ่าน ตรวจ: nginx -t และ journalctl -u nginx"
+  fi
+elif [[ "$CF_TUNNEL" == yes ]]; then
   step "   Cloudflare Tunnel"
+  if ! command -v cloudflared >/dev/null; then
+    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg -o /usr/share/keyrings/cloudflare-main.gpg
+    echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared bookworm main" \
+      > /etc/apt/sources.list.d/cloudflared.list
+    apt-get update -y && apt-get install -y cloudflared
+  fi
+  CF_DIR=/etc/cloudflared
   if [[ -n "$CF_TUNNEL_TOKEN" ]]; then
-    if ! command -v cloudflared >/dev/null; then
-      curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg -o /usr/share/keyrings/cloudflare-main.gpg
-      echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared bookworm main" \
-        > /etc/apt/sources.list.d/cloudflared.list
-      apt-get update -y && apt-get install -y cloudflared
-    fi
+    # วิธีเดิม: tunnel ที่สร้างใน Cloudflare Dashboard (ใช้ token)
     systemctl is-enabled cloudflared >/dev/null 2>&1 || cloudflared service install "$CF_TUNNEL_TOKEN"
     systemctl restart cloudflared
-    ok "cloudflared ทำงานแล้ว"
+    ok "cloudflared ทำงานแล้ว (ใช้ token)"
   else
-    warn "ไม่ได้ใส่ CF_TUNNEL_TOKEN — ถือว่าติดตั้ง cloudflared ไว้แล้ว"
+    # วิธีไม่ต้องใช้ token: ล็อกอิน Cloudflare ผ่านเบราว์เซอร์ครั้งเดียว แล้วสคริปต์สร้าง tunnel + DNS ให้เอง
+    CF_TUNNEL_NAME="${CF_TUNNEL_NAME:-$APP_NAME}"
+    export TUNNEL_ORIGIN_CERT="${TUNNEL_ORIGIN_CERT:-/root/.cloudflared/cert.pem}"
+    install -d -m 700 /root/.cloudflared "$CF_DIR"
+    if [[ ! -s "$TUNNEL_ORIGIN_CERT" ]]; then
+      if [[ -t 0 ]]; then
+        echo
+        echo "  ┌────────────────────────────────────────────────────────────┐"
+        echo "  │ เปิดลิงก์ที่จะแสดงด้านล่างในเบราว์เซอร์ → ล็อกอิน Cloudflare │"
+        echo "  │ → เลือกโดเมน itdev.in.th → กด Authorize (สคริปต์รอให้เอง)   │"
+        echo "  └────────────────────────────────────────────────────────────┘"
+        cloudflared tunnel login || warn "ล็อกอิน Cloudflare ไม่สำเร็จ"
+      else
+        warn "รันแบบไม่มีเทอร์มินัล จึงล็อกอิน Cloudflare ไม่ได้ — รันสคริปต์ใหม่จากเทอร์มินัลจริง (SSH) หรือใส่ CF_TUNNEL_TOKEN"
+      fi
+    fi
+    if [[ -s "$TUNNEL_ORIGIN_CERT" ]]; then
+      if ! cloudflared tunnel list --output json 2>/dev/null | grep -q "\"name\": *\"${CF_TUNNEL_NAME}\""; then
+        cloudflared tunnel create "$CF_TUNNEL_NAME"
+      fi
+      CF_UUID="$(cloudflared tunnel list --output json | python3 -c 'import sys,json
+n=sys.argv[1]
+for t in json.load(sys.stdin):
+    if t["name"]==n and not t.get("deleted_at"): print(t["id"]); break' "$CF_TUNNEL_NAME")"
+      [[ -n "$CF_UUID" ]] || die "ไม่พบ tunnel ${CF_TUNNEL_NAME} หลังสร้าง"
+      [[ -s "/root/.cloudflared/${CF_UUID}.json" ]] && install -m 600 "/root/.cloudflared/${CF_UUID}.json" "$CF_DIR/${CF_UUID}.json"
+      [[ -s "$CF_DIR/${CF_UUID}.json" ]] || die "ไม่พบไฟล์ credentials ของ tunnel (/root/.cloudflared/${CF_UUID}.json) — ลบ tunnel ใน Cloudflare แล้วรันใหม่"
+      cloudflared tunnel route dns --overwrite-dns "$CF_UUID" "$DOMAIN" || warn "ตั้ง DNS ของ $DOMAIN ไม่สำเร็จ (โดเมนต้องอยู่ใน Cloudflare)"
+      {
+        echo "tunnel: ${CF_UUID}"
+        echo "credentials-file: ${CF_DIR}/${CF_UUID}.json"
+        echo "ingress:"
+        echo "  - hostname: ${DOMAIN}"
+        echo "    service: http://localhost:80"
+        if [[ "$INSTALL_N8N" == "yes" && -n "$N8N_DOMAIN" ]]; then
+          cloudflared tunnel route dns --overwrite-dns "$CF_UUID" "$N8N_DOMAIN" || warn "ตั้ง DNS ของ $N8N_DOMAIN ไม่สำเร็จ"
+          echo "  - hostname: ${N8N_DOMAIN}"
+          echo "    service: http://localhost:80"
+        fi
+        echo "  - service: http_status:404"
+      } > "$CF_DIR/config.yml"
+      chmod 600 "$CF_DIR/config.yml"
+      cloudflared --config "$CF_DIR/config.yml" tunnel ingress validate
+      systemctl is-enabled cloudflared >/dev/null 2>&1 || cloudflared --config "$CF_DIR/config.yml" service install
+      systemctl enable cloudflared >/dev/null 2>&1 || true
+      systemctl restart cloudflared
+      ok "cloudflared ทำงานแล้ว: https://${DOMAIN} → localhost:80 (tunnel ${CF_TUNNEL_NAME})"
+    else
+      warn "ยังไม่ได้ตั้ง Cloudflare Tunnel — แอปรันที่ http://127.0.0.1:${APP_PORT} (ภายในเครื่องเท่านั้น) รันสคริปต์ซ้ำเพื่อล็อกอิน Cloudflare"
+    fi
   fi
-  ok "ใน Cloudflare ให้ตั้ง Service ของ ${DOMAIN:-hostname} เป็น  HTTP → localhost:80"
 elif [[ -n "$DOMAIN" && -n "$LE_EMAIL" ]]; then
   step "   ขอใบรับรอง HTTPS (Let's Encrypt)"
   CERT_DOMAINS=(-d "$DOMAIN")
@@ -396,6 +477,159 @@ elif [[ -n "$DOMAIN" && -n "$LE_EMAIL" ]]; then
     warn "ขอ HTTPS ไม่สำเร็จ — ตรวจว่า DNS ชี้มาที่ ${SERVER_IP} แล้วรัน: certbot --nginx ${CERT_DOMAINS[*]}"
   fi
 fi
+
+# ---------- 10. ความปลอดภัย + การดูแลระบบ (swap, firewall, สำรองข้อมูล, เฝ้าระวัง) ----------
+step "10/10 swap, firewall, สำรองข้อมูล, ตรวจสุขภาพระบบ"
+
+# 10.1 swap (เครื่อง 2 GB: FFmpeg + PostgreSQL + n8n พร้อมกันเสี่ยง OOM)
+mem_kb="$(awk '/MemTotal/ {print $2}' /proc/meminfo)"
+if [[ -z "$(swapon --show --noheadings 2>/dev/null)" && "$mem_kb" -le 3145728 ]]; then
+  if { fallocate -l "${SWAP_MB}M" /swapfile || dd if=/dev/zero of=/swapfile bs=1M count="$SWAP_MB" status=none; } \
+     && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile; then
+    grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    echo 'vm.swappiness=10' > /etc/sysctl.d/99-ai-social.conf; sysctl -q -p /etc/sysctl.d/99-ai-social.conf || true
+    ok "สร้าง swap ${SWAP_MB} MB"
+  else
+    rm -f /swapfile; warn "สร้าง swap ไม่ได้ (อาจเป็น container/LXC) — ข้าม"
+  fi
+else
+  ok "swap: $(swapon --show --noheadings 2>/dev/null | awk '{print $3}' | paste -sd, - || true) (ไม่ต้องสร้างเพิ่ม)"
+fi
+
+# 10.2 จำกัดขนาด log
+install -d /etc/systemd/journald.conf.d
+printf '[Journal]\nSystemMaxUse=300M\nMaxRetentionSec=1month\n' > /etc/systemd/journald.conf.d/ai-social.conf
+systemctl restart systemd-journald 2>/dev/null || true
+cat > /etc/logrotate.d/${APP_NAME} <<EOF
+${LOG_FILE} {
+    monthly
+    rotate 6
+    compress
+    missingok
+    notifempty
+}
+EOF
+ok "จำกัด journal 300 MB และหมุน log ติดตั้ง"
+
+# 10.3 firewall + fail2ban
+if [[ "$ENABLE_UFW" == yes ]]; then
+  SSH_PORT="$(ss -tlnp 2>/dev/null | awk '/sshd/ {n=split($4,a,":"); print a[n]; exit}')"
+  if [[ -z "$SSH_PORT" ]]; then
+    warn "หาพอร์ต SSH ไม่เจอ — ข้าม firewall เพื่อกันล็อกตัวเองออก (ตั้งเองด้วย ufw ภายหลัง)"
+  else
+    apt-get install -y --no-install-recommends ufw fail2ban python3-systemd >/dev/null
+    ufw --force reset >/dev/null
+    ufw default deny incoming >/dev/null; ufw default allow outgoing >/dev/null
+    ufw allow "${SSH_PORT}/tcp" >/dev/null
+    # หลัง Cloudflare Tunnel ไม่ต้องเปิด 80/443 ออกอินเทอร์เน็ต (cloudflared ต่อออกไปเอง)
+    if [[ "$CF_TUNNEL" == existing ]]; then
+      # tunnel อยู่ที่เครื่องอื่นในวง LAN: เปิดพอร์ต 80 ให้เฉพาะเครือข่ายภายใน
+      for net in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do ufw allow from "$net" to any port 80 proto tcp >/dev/null; done
+    elif [[ "$CF_TUNNEL" != yes ]]; then ufw allow 80/tcp >/dev/null; ufw allow 443/tcp >/dev/null; fi
+    # TurnKey: คงพอร์ตหน้าจัดการที่เปิดอยู่ไว้ ไม่งั้นอาจเข้าเครื่องไม่ได้
+    for p in 12320 12321 12322 12323; do
+      ss -tln 2>/dev/null | grep -q ":${p} " && { ufw allow "${p}/tcp" >/dev/null; warn "เปิดพอร์ต TurnKey ${p} ไว้ (ปิดเองได้ด้วย: ufw delete allow ${p}/tcp)"; }
+    done
+    ufw --force enable >/dev/null
+    printf '[sshd]\nenabled = true\nbackend = systemd\nmaxretry = 5\nbantime = 1h\n' > /etc/fail2ban/jail.d/ai-social.local
+    systemctl enable --now fail2ban >/dev/null 2>&1 || true
+    systemctl restart fail2ban 2>/dev/null || true
+    ok "ufw เปิดแล้ว (SSH ${SSH_PORT}$(case "$CF_TUNNEL" in existing) echo ', พอร์ต 80 เฉพาะวง LAN';; yes) echo ', ไม่เปิด 80/443 ออกนอก';; *) echo ', 80, 443';; esac)) + fail2ban"
+  fi
+fi
+
+# 10.4 แจ้งเตือน (webhook แบบ Discord/Slack) — ไม่ใส่ URL ก็ไม่ส่ง
+umask 077
+[[ -f /etc/${APP_NAME}-alert.env ]] || echo "ALERT_WEBHOOK_URL=" > /etc/${APP_NAME}-alert.env
+[[ -n "$ALERT_WEBHOOK_URL" ]] && sed -i "s|^ALERT_WEBHOOK_URL=.*|ALERT_WEBHOOK_URL=${ALERT_WEBHOOK_URL//|/\\|}|" /etc/${APP_NAME}-alert.env
+umask 022
+cat > /usr/local/sbin/${APP_NAME}-alert <<'EOF'
+#!/usr/bin/env bash
+# ใช้: ai-social-alert "ข้อความ"   (อ่าน ALERT_WEBHOOK_URL จาก /etc/ai-social-alert.env)
+set -u
+msg="[$(hostname)] $*"
+logger -t ai-social-alert "$msg"
+. /etc/ai-social-alert.env 2>/dev/null || exit 0
+[[ -n "${ALERT_WEBHOOK_URL:-}" ]] || exit 0
+json=$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g')
+curl -fsS -m 10 -H 'Content-Type: application/json' -d "{\"content\":\"$json\",\"text\":\"$json\"}" "$ALERT_WEBHOOK_URL" >/dev/null || true
+EOF
+chmod 755 /usr/local/sbin/${APP_NAME}-alert
+
+# 10.5 สำรองข้อมูลทุกวัน (ฐานข้อมูล + .env) เก็บ 14 วัน
+cat > /usr/local/sbin/${APP_NAME}-backup <<EOF
+#!/usr/bin/env bash
+set -Eeuo pipefail
+DEST=/var/backups/${APP_NAME}; KEEP_DAYS=14; BACKUP_MEDIA="${BACKUP_MEDIA}"
+trap '/usr/local/sbin/${APP_NAME}-alert "สำรองข้อมูลล้มเหลว (ดู journalctl -u ${APP_NAME}-backup)"' ERR
+install -d -m 700 "\$DEST"; ts=\$(date +%F_%H%M)
+runuser -u postgres -- pg_dump --format=custom ${DB_NAME} > "\$DEST/db-\$ts.dump"
+tar -czf "\$DEST/config-\$ts.tgz" -C / ${APP_DIR#/}/.env etc/${APP_NAME}-n8n.env 2>/dev/null || true
+if [[ "\$BACKUP_MEDIA" == yes ]]; then tar -czf "\$DEST/media-\$ts.tgz" -C / var/lib/${APP_NAME}/media; fi
+chmod 600 "\$DEST"/*-"\$ts".*
+find "\$DEST" -type f -mtime +\$KEEP_DAYS -delete
+echo "backup ok: \$DEST (\$(du -sh "\$DEST" | cut -f1))"
+EOF
+chmod 755 /usr/local/sbin/${APP_NAME}-backup
+cat > /etc/systemd/system/${APP_NAME}-backup.service <<EOF
+[Unit]
+Description=AI Social Automation daily backup
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/${APP_NAME}-backup
+EOF
+cat > /etc/systemd/system/${APP_NAME}-backup.timer <<EOF
+[Unit]
+Description=Daily backup at 03:30
+[Timer]
+OnCalendar=*-*-* 03:30:00
+RandomizedDelaySec=300
+Persistent=true
+[Install]
+WantedBy=timers.target
+EOF
+
+# 10.6 ตรวจสุขภาพทุก 5 นาที: ล่ม 2 ครั้งติด -> รีสตาร์ท + แจ้งเตือน, ดิสก์เกิน 85% -> แจ้งเตือน
+cat > /usr/local/sbin/${APP_NAME}-healthcheck <<EOF
+#!/usr/bin/env bash
+set -u
+STATE=/run/${APP_NAME}-health.fails
+if curl -fsS -m 10 "http://127.0.0.1:${APP_PORT}/api/ready" >/dev/null 2>&1; then
+  [[ -f "\$STATE" ]] && /usr/local/sbin/${APP_NAME}-alert "แอปกลับมาทำงานปกติแล้ว"
+  rm -f "\$STATE"
+else
+  n=\$(( \$(cat "\$STATE" 2>/dev/null || echo 0) + 1 )); echo "\$n" > "\$STATE"
+  if [[ \$n -eq 2 ]]; then
+    /usr/local/sbin/${APP_NAME}-alert "แอปไม่ตอบ /api/ready 2 ครั้งติด — กำลังรีสตาร์ท"
+    systemctl restart ${APP_NAME}
+  fi
+fi
+use=\$(df --output=pcent /var/lib/${APP_NAME} | tail -1 | tr -dc 0-9)
+if [[ "\${use:-0}" -ge 85 ]]; then
+  [[ -f /run/${APP_NAME}-disk.warned ]] || { /usr/local/sbin/${APP_NAME}-alert "ดิสก์ใช้ไป \${use}% — ลบวิดีโอเก่าหรือขยายดิสก์"; touch /run/${APP_NAME}-disk.warned; }
+else rm -f /run/${APP_NAME}-disk.warned; fi
+EOF
+chmod 755 /usr/local/sbin/${APP_NAME}-healthcheck
+cat > /etc/systemd/system/${APP_NAME}-healthcheck.service <<EOF
+[Unit]
+Description=AI Social Automation health check
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/${APP_NAME}-healthcheck
+EOF
+cat > /etc/systemd/system/${APP_NAME}-healthcheck.timer <<EOF
+[Unit]
+Description=Health check every 5 minutes
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+[Install]
+WantedBy=timers.target
+EOF
+systemctl daemon-reload
+systemctl enable --now ${APP_NAME}-backup.timer ${APP_NAME}-healthcheck.timer >/dev/null
+/usr/local/sbin/${APP_NAME}-backup >/dev/null && ok "สำรองข้อมูลทดสอบ 1 ครั้งสำเร็จ → /var/backups/${APP_NAME}" || warn "สำรองข้อมูลทดสอบไม่ผ่าน ดู journalctl"
+ok "ตั้งเวลาสำรอง 03:30 ทุกวัน + ตรวจสุขภาพทุก 5 นาที (ใส่ ALERT_WEBHOOK_URL ใน /etc/${APP_NAME}-alert.env เพื่อรับแจ้งเตือน)"
 
 # ---------- สรุป ----------
 cat <<EOF
@@ -418,6 +652,10 @@ cat <<EOF
    systemctl restart ${APP_NAME}        # รีสตาร์ทหลังแก้ .env
    journalctl -u n8n -f                 # ดู log n8n
    bash install.sh                      # รันซ้ำเพื่ออัปเดตโค้ด
+
+ สำรองข้อมูล   : /var/backups/${APP_NAME}  (ทุกวัน 03:30, เก็บ 14 วัน)  สั่งเองด้วย: ${APP_NAME}-backup
+   กู้คืน: systemctl stop ${APP_NAME} && runuser -u postgres -- pg_restore --clean --if-exists -d ${DB_NAME} <ไฟล์ db-*.dump> && systemctl start ${APP_NAME}
+ แจ้งเตือน     : ใส่ ALERT_WEBHOOK_URL ใน /etc/${APP_NAME}-alert.env
 
  หมายเหตุ: PUBLISHER_MODE=$(env_get PUBLISHER_MODE) — เปลี่ยนเป็น live เมื่อพร้อมโพสต์จริง
 EOF
