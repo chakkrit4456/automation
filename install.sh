@@ -3,7 +3,7 @@
 #  AI Social Automation — ตัวติดตั้งแบบไม่ใช้ Docker
 #  สำหรับ: TurnKey Linux Node.js (debian-12-turnkey-nodejs_18.0-1) / Debian 12
 #
-#  ติดตั้งให้ครบ: Node.js 22, PostgreSQL, FFmpeg + ฟอนต์ไทย, edge-tts,
+#  ติดตั้งให้ครบ: Node.js 24, PostgreSQL, FFmpeg + ฟอนต์ไทย, edge-tts,
 #  n8n, Nginx (reverse proxy), systemd services, HTTPS (ถ้าใส่โดเมน)
 #
 #  วิธีใช้ (ในโฟลเดอร์โปรเจคบนเซิร์ฟเวอร์, รันด้วย root):
@@ -58,7 +58,7 @@ ALERT_WEBHOOK_URL="${ALERT_WEBHOOK_URL:-}"
 ENABLE_UFW="${ENABLE_UFW:-yes}"
 SWAP_MB="${SWAP_MB:-2048}"
 BACKUP_MEDIA="${BACKUP_MEDIA:-no}"
-NODE_MAJOR=22
+NODE_MAJOR=24   # n8n 2.x ต้องการ Node >= 24 (backend ต้องการ >= 22.9)
 DB_NAME="ai_social"
 DB_USER="ai_social"
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -106,6 +106,17 @@ echo " Target : $APP_DIR"
 echo " Domain : ${DOMAIN:-<ใช้ IP>}   n8n: ${N8N_DOMAIN:-<localhost only>}"
 echo "============================================================"
 
+# n8n อย่างเดียวใช้ราว 3 GB — ถ้าดิสก์เต็ม npm จะล้มกลางทาง (ENOSPC)
+free_mb="$(df -Pm / | awk 'NR==2{print $4}')"
+if [[ "$free_mb" -lt 3072 ]]; then
+  warn "พื้นที่ดิสก์ว่างเหลือ ${free_mb} MB (แนะนำ >= 3 GB) — ล้าง cache ให้ก่อน"
+  apt-get clean || true
+  npm cache clean --force >/dev/null 2>&1 || true
+  journalctl --vacuum-size=100M >/dev/null 2>&1 || true
+  free_mb="$(df -Pm / | awk 'NR==2{print $4}')"
+  [[ "$free_mb" -lt 1024 ]] && die "ดิสก์ว่างเหลือแค่ ${free_mb} MB — ขยายดิสก์ก่อน (แนะนำ >= 16 GB)"
+fi
+
 # ---------- 1. แพ็กเกจระบบ ----------
 step "1/10 ติดตั้งแพ็กเกจระบบ"
 apt-get update -y
@@ -118,7 +129,7 @@ apt-get install -y --no-install-recommends \
 fc-cache -f >/dev/null || true
 ok "แพ็กเกจระบบพร้อม"
 
-# ---------- 2. Node.js 22 (TurnKey มาพร้อม 18 แต่ backend ต้องการ >=22.9) ----------
+# ---------- 2. Node.js 24 (TurnKey มาพร้อม 18; backend ต้องการ >=22.9, n8n 2.x ต้องการ >=24) ----------
 step "2/10 ติดตั้ง Node.js ${NODE_MAJOR}"
 cur_major="$(node -v 2>/dev/null | sed -E 's/^v([0-9]+).*/\1/' || echo 0)"
 if [[ "${cur_major:-0}" -lt "$NODE_MAJOR" ]]; then
@@ -138,8 +149,8 @@ if [[ "${cur_major:-0}" -lt "$NODE_MAJOR" ]]; then
   hash -r
 fi
 NODE_BIN="$(command -v node)"
-node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a>22||(a===22&&b>=9)?0:1)' \
-  || die "ต้องการ Node >= 22.9 แต่ได้ $(node -v)"
+node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a>=24?0:1)' \
+  || die "ต้องการ Node >= 24 แต่ได้ $(node -v)"
 ok "Node $(node -v), npm $(npm -v)"
 
 # ---------- 3. ผู้ใช้ระบบ + คัดลอกโค้ด ----------
@@ -208,6 +219,7 @@ ok ".env พร้อม (PUBLIC_URL=$PUBLIC_URL)"
 # ---------- 6. PostgreSQL ----------
 step "6/10 ตั้งค่า PostgreSQL"
 systemctl enable --now postgresql
+cd /   # ให้ผู้ใช้ postgres ไม่เตือน "could not change directory"
 for i in {1..20}; do runuser -u postgres -- pg_isready -q && break; sleep 1; done
 runuser -u postgres -- psql -v ON_ERROR_STOP=1 -q <<SQL
 DO \$\$ BEGIN
@@ -266,8 +278,19 @@ EOF
 
 if [[ "$INSTALL_N8N" == "yes" ]]; then
   step "   ติดตั้ง n8n (อาจใช้เวลาหลายนาที)"
-  if ! command -v n8n >/dev/null; then npm install -g n8n --no-audit --no-fund; fi
   install -d -o "$APP_USER" -g "$APP_USER" /var/lib/n8n
+  # ติดตั้งใหม่ถ้ายังไม่มี/รันไม่ได้; ถ้า Node เปลี่ยนเวอร์ชัน ต้อง rebuild native module (เช่น isolated-vm)
+  N8N_ABI_FILE=/var/lib/n8n/.node-abi
+  NODE_ABI="$(node -p process.versions.modules)"
+  if ! command -v n8n >/dev/null || ! n8n --version >/dev/null 2>&1; then
+    npm install -g n8n --no-audit --no-fund
+  elif [[ "$(cat "$N8N_ABI_FILE" 2>/dev/null)" != "$NODE_ABI" ]]; then
+    warn "Node เปลี่ยนเวอร์ชัน — rebuild native modules ของ n8n"
+    (cd "$(npm root -g)/n8n" && npm rebuild --no-audit --no-fund)
+  fi
+  n8n --version >/dev/null 2>&1 || die "n8n รันไม่ได้กับ Node $(node -v) — ดู: n8n --version"
+  echo "$NODE_ABI" > "$N8N_ABI_FILE"
+  npm cache clean --force >/dev/null 2>&1 || true
   if [[ -n "$N8N_DOMAIN" ]]; then
     N8N_PROTO=$([[ -n "$LE_EMAIL" || "$BEHIND_CF" == yes ]] && echo https || echo http)
     N8N_BASE="${N8N_PROTO}://${N8N_DOMAIN}/"; N8N_HOSTNAME="$N8N_DOMAIN"
@@ -332,6 +355,21 @@ for i in {1..45}; do
   [[ $i -eq 45 ]] && { echo; journalctl -u ${APP_NAME} -n 40 --no-pager; die "แอปไม่เริ่มทำงาน"; }
 done
 
+if [[ "$INSTALL_N8N" == "yes" ]]; then
+  echo -n "  รอ n8n เริ่มทำงาน"
+  for i in {1..60}; do
+    # /healthz ตอบได้ก่อน n8n crash ตอน init — ต้องยังอยู่หลังผ่านไป 15 วินาทีด้วย
+    if curl -fsS "http://127.0.0.1:${N8N_PORT}/healthz" >/dev/null 2>&1; then
+      sleep 15
+      if systemctl is-active -q n8n && [[ "$(systemctl show n8n -p NRestarts --value)" == 0 ]]; then
+        echo; ok "n8n ตอบสนองที่ /healthz"; break
+      fi
+    fi
+    echo -n "."; sleep 3
+    [[ $i -eq 60 ]] && { echo; journalctl -u n8n -n 30 --no-pager; warn "n8n ยังไม่ตอบสนอง ตรวจ: journalctl -u n8n -f"; }
+  done
+fi
+
 # ---------- 9. Nginx + HTTPS ----------
 step "9/10 ตั้งค่า Nginx"
 # ปิด site เดิมของ TurnKey (สำรองไว้ใน /etc/nginx/sites-disabled-turnkey)
@@ -359,7 +397,7 @@ server {
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \${FWD_PROTO};
+        proxy_set_header X-Forwarded-Proto ${FWD_PROTO};
         proxy_read_timeout 900s;
         proxy_send_timeout 900s;
     }
@@ -380,7 +418,7 @@ server {
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \${FWD_PROTO};
+        proxy_set_header X-Forwarded-Proto ${FWD_PROTO};
         proxy_buffering off;
         proxy_read_timeout 900s;
     }
@@ -396,7 +434,13 @@ ok "Nginx พร้อม"
 if [[ "$CF_TUNNEL" == existing ]]; then
   step "   Cloudflare Tunnel (ใช้ tunnel เดิมที่ตั้งไว้แล้ว)"
   ok "ไม่ติดตั้ง cloudflared บนเครื่องนี้ — ใน Cloudflare ให้ route ${DOMAIN} → http://${SERVER_IP} (พอร์ต 80)"
-  if curl -fsS -m 5 -H "Host: ${DOMAIN}" "http://127.0.0.1/api/health" >/dev/null 2>&1; then
+  # nginx reload ทำงานแบบ async — ลองซ้ำสักครู่ก่อนสรุปว่าไม่ผ่าน
+  nginx_ok=no
+  for i in {1..10}; do
+    curl -fsS -m 5 -H "Host: ${DOMAIN}" "http://127.0.0.1/api/health" >/dev/null 2>&1 && { nginx_ok=yes; break; }
+    sleep 1
+  done
+  if [[ "$nginx_ok" == yes ]]; then
     ok "Nginx ตอบ Host ${DOMAIN} ได้ถูกต้อง"
   else
     warn "ทดสอบ Nginx ด้วย Host ${DOMAIN} ไม่ผ่าน ตรวจ: nginx -t และ journalctl -u nginx"
