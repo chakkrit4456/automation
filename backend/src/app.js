@@ -15,6 +15,7 @@ const oauth = require("./oauth");
 const { verifyAccount, tiktokCreatorInfo } = require("./publishers");
 const compliance = require("./compliance");
 const legal = require("./legal");
+const { AI_PRESETS, resolveAi, testAi } = require("./providers");
 
 const SETTINGS_SECTIONS = ["general", "ai", "video", "storage", "social", "security", "notifications"];
 
@@ -192,11 +193,9 @@ function buildApp(options) {
   app.post("/api/ai/generate", async (request) => {
     limit(hits, request.ip, "generate", 30);
     const input = validateGenerateInput(request.body);
-    const settings = await store.getSettings();
     const savedMode = request.body?.save || null;
     return services.generateAndOptionallySave(store, input, {
-      apiKey: config.anthropicApiKey || null,
-      model: settings.ai?.model || config.anthropicModel,
+      ai: await services.currentAi(store, config),
       save: savedMode === "draft" || savedMode === "queue",
       queue: savedMode === "queue",
       scheduledAt: request.body?.scheduled_at || null,
@@ -583,8 +582,7 @@ function buildApp(options) {
   app.post("/api/automation/run-now", async () =>
     services.runAutomation(store, {
       publisherMode: config.publisherMode,
-      apiKey: config.anthropicApiKey,
-      model: config.anthropicModel,
+      ai: await services.currentAi(store, config),
       video: config.video,
       config,
     })
@@ -634,30 +632,28 @@ function buildApp(options) {
     const section = request.params.section;
     if (!SETTINGS_SECTIONS.includes(section)) throw httpError(404, "NOT_FOUND", "Unknown settings section");
     const patch = { ...(request.body || {}) };
-    if (section === "ai" && patch.api_key) {
-      patch.api_key_encrypted = services.encryptSecret(patch.api_key, config.appSecret);
-      patch.api_key_set = true;
-      delete patch.api_key;
+    if (section === "ai") {
+      if (patch.provider && !AI_PRESETS[patch.provider]) {
+        throw httpError(400, "VALIDATION", `provider must be one of: ${Object.keys(AI_PRESETS).join(", ")}`);
+      }
+      const apiKey = patch.api_key;
+      // Server-owned and display-only fields never come from the dashboard.
+      for (const key of ["api_key", "providers", "base_url", "api_key_set", "api_key_hint", "api_key_provider", "api_key_encrypted"]) {
+        delete patch[key];
+      }
+      if (apiKey) {
+        const current = await store.getSettings();
+        patch.api_key_encrypted = services.encryptSecret(apiKey, config.appSecret);
+        patch.api_key_provider = patch.provider || current.ai?.provider || config.ai?.provider;
+        patch.api_key_set = true;
+      }
     }
     delete patch.api_key_encrypted_plain;
     const saved = await store.saveSettings(section, patch);
-    if (section === "ai" && saved.ai?.api_key_encrypted && !config.anthropicApiKey) {
-      config.anthropicApiKey = services.decryptSecret(saved.ai.api_key_encrypted, config.appSecret);
-    }
     return maskSettings(saved, config);
   });
 
-  app.post("/api/settings/ai/test", async () => {
-    const key = config.anthropicApiKey;
-    if (!key) throw httpError(400, "NOT_CONFIGURED", "Anthropic API key is not set. Claude Pro does not include API credits.");
-    const response = await fetch("https://api.anthropic.com/v1/models?limit=1", {
-      headers: { "x-api-key": key, "anthropic-version": "2023-06-01" },
-    }).catch(() => null);
-    if (!response) throw httpError(502, "AI_UPSTREAM", "Could not reach the Claude API");
-    if (response.status === 401) throw httpError(400, "AI_KEY_INVALID", "The Anthropic API key was rejected");
-    if (!response.ok) throw httpError(502, "AI_UPSTREAM", `Claude API returned HTTP ${response.status}`);
-    return { status: "ok", note: "Key accepted by the Claude API." };
-  });
+  app.post("/api/settings/ai/test", async () => testAi(await services.currentAi(store, config)));
 
   const dist = config.staticDir;
   if (dist && fs.existsSync(path.join(dist, "index.html"))) {
@@ -713,7 +709,15 @@ function maskSettings(settings, config) {
   const ai = { ...(settings.ai || {}) };
   delete ai.api_key_encrypted;
   delete ai.api_key;
-  ai.api_key_set = Boolean(config.anthropicApiKey || settings.ai?.api_key_set);
+  const active = resolveAi(config, settings.ai || {});
+  ai.provider = active.provider;
+  ai.model = active.model;
+  ai.base_url = active.baseUrl;
+  ai.providers = Object.entries(AI_PRESETS).map(([id, preset]) => ({ id, label: preset.label, model: preset.model, needs_key: preset.needsKey }));
+  ai.api_key_set = Boolean(
+    (active.provider === config.ai?.provider && config.ai?.apiKey) ||
+      (settings.ai?.api_key_set && settings.ai?.api_key_provider === active.provider)
+  );
   ai.api_key_hint = ai.api_key_set ? "configured" : "";
   return { ...settings, ai };
 }

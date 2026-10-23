@@ -1,5 +1,5 @@
 # Stage 1: build the dashboard.
-FROM node:22-bookworm-slim AS web
+FROM node:24-trixie-slim AS web
 WORKDIR /web
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
@@ -7,7 +7,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: API + FFmpeg + Thai fonts + Edge TTS.
-FROM node:22-bookworm-slim
+FROM node:24-trixie-slim
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ffmpeg fonts-noto-core fonts-thai-tlwg python3 python3-pip ca-certificates \
   && pip3 install --no-cache-dir --break-system-packages edge-tts \

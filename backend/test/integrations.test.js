@@ -509,7 +509,7 @@ test("privacy, terms and data deletion pages are public and carry the required l
   for (const link of ["https://www.youtube.com/t/terms", "http://www.google.com/policies/privacy", "https://security.google.com/settings/security/permissions"]) {
     assert.ok(privacy.body.includes(link), link);
   }
-  assert.match(privacy.body, /Anthropic/);
+  assert.match(privacy.body, /Ollama/);
   const terms = await app.inject({ method: "GET", url: "/terms" });
   assert.match(terms.body, /music-usage-confirmation/);
   const deletion = await app.inject({ method: "GET", url: "/data-deletion?code=<script>" });

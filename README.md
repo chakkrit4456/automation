@@ -17,16 +17,17 @@ Without `DATABASE_URL`, the API keeps state in memory and loads sample content.
 ## Deploy to the server (no Docker) — automation.itdev.in.th
 
 ```bash
-bash install.sh   # as root on Debian 12 over SSH; DOMAIN=automation.itdev.in.th, uses your existing Cloudflare tunnel (no token needed)
+bash install.sh   # as root on Debian 13 (trixie) standard or Debian 12, over SSH; DOMAIN=automation.itdev.in.th, uses your existing Cloudflare tunnel (no token needed)
 ```
 
-Installs everything, plus swap, firewall, daily backups and a health check. Full steps: `docs/14-ขึ้นใช้งานจริง.md`. How to get the YouTube / Meta / TikTok keys: `docs/15-ขอคีย์โซเชียล.md`.
+Installs everything, including Ollama with a free open-weight model (`gemma3:4b`, or `qwen2.5:1.5b` under 6 GB RAM), plus swap, firewall, daily backups and a health check. Full steps: `docs/14-ขึ้นใช้งานจริง.md`. How to get the YouTube / Meta / TikTok keys: `docs/15-ขอคีย์โซเชียล.md`.
 
 ## Run the full stack with Docker (alternative)
 
 ```bash
-node scripts/make-env.js              # then edit PUBLIC_URL, ANTHROPIC_API_KEY, OAuth ids
-docker compose up -d --build          # postgres + app (FFmpeg, Thai fonts, edge-tts) + n8n
+node scripts/make-env.js              # then edit PUBLIC_URL and OAuth ids
+docker compose up -d --build          # postgres + app (FFmpeg, Thai fonts, edge-tts) + ollama + n8n
+docker compose exec ollama ollama pull gemma3:4b   # once: download the free model
 ```
 
 The dashboard is at http://127.0.0.1:3000 and n8n at http://127.0.0.1:5678. Both bind to localhost only; put Nginx in front (`deploy/nginx/ai-social.conf`). PostgreSQL stays on the internal Docker network. Full steps are in `docs/14-ขึ้นใช้งานจริง.md`.
@@ -35,7 +36,7 @@ The dashboard is at http://127.0.0.1:3000 and n8n at http://127.0.0.1:5678. Both
 
 | Stage | Implementation |
 | --- | --- |
-| Script | Claude API (`ANTHROPIC_API_KEY`), mock concepts without a key |
+| Script | Free models only: Ollama on the server (default, no key), or the free tiers of Groq / Gemini / OpenRouter `:free` (`AI_PROVIDER`, `AI_MODEL`, `AI_API_KEY`) |
 | Voice | edge-tts (`TTS_VOICE`, Thai voices included), silent video if TTS is unavailable |
 | Subtitles | Thai word segmentation, ASS styles burned in by FFmpeg, `.srt` sidecar saved |
 | Video | FFmpeg 1080×1920 H.264/AAC MP4, one render at a time |
@@ -85,7 +86,7 @@ The Debian server is the application host. PostgreSQL runs on the same server an
 - Web frontend
 - Self-hosted PostgreSQL on the Debian server
 - Self-hosted n8n
-- Claude API for content generation
+- Free AI models for content generation (self-hosted Ollama by default; no paid API)
 - FFmpeg for video processing
 - External/free-tier TTS or lightweight TTS
 - Local persistent media directory initially; optional external object storage later
@@ -101,10 +102,10 @@ PostgreSQL should not be exposed to the public Internet. Only the application an
 
 ## Resource policy
 
-Target server:
-- 2 GB RAM
-- 1 vCPU
-- no local LLM
+Target server (Debian 13 standard):
+- 4 GB RAM minimum with `qwen2.5:1.5b`; 8 GB recommended for `gemma3:4b`
+- 2 vCPU
+- 20 GB disk
 
 Keep:
 - PostgreSQL connection pool small
@@ -114,15 +115,14 @@ Keep:
 - no Redis initially
 - no Kubernetes
 
-The system is designed to work without a local LLM or local image-generation model.
+Text generation runs on a small local model through Ollama (CPU is enough). There is no local image or video generation model.
 
-## Important billing distinction
+## AI cost
 
-Claude Pro and the Anthropic API are separate products. A Claude Pro subscription should not be assumed to provide API credits. Keep the Claude API credential separate from the user's Claude Pro account.
+Every AI step is free. Scripts come from an open-weight model served by Ollama on the same server. If the server is too small, `AI_PROVIDER` can point at the free tier of Groq, Google Gemini (use a Google project without billing) or OpenRouter (the app refuses models that do not end with `:free`). Voice-over uses free Microsoft Edge voices; video is rendered locally with FFmpeg.
 
 ## Non-goals for the first MVP
 
-- Local LLM inference
 - Local image generation
 - Local text-to-video generation
 - Browser scraping of social platforms
@@ -135,7 +135,7 @@ Claude Pro and the Anthropic API are separate products. A Claude Pro subscriptio
 1. Dashboard shell
 2. Self-hosted PostgreSQL schema and migrations
 3. Content CRUD
-4. Claude content generation
+4. AI content generation (free models)
 5. Video pipeline
 6. Scheduler
 7. Mock publishers

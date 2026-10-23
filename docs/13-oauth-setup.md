@@ -15,7 +15,7 @@ Meta and TikTok require HTTPS for production redirect URIs, so `PUBLIC_URL` must
 
 After the credentials are in `.env`, restart the app. Open **Social accounts** and press **Connect** on a platform card. You sign in on the platform's page, and the app returns you to the dashboard with the account connected. Press **Test** to confirm that the stored token works. In `PUBLISHER_MODE=live` this calls the platform API.
 
-Claude Pro does not include Anthropic API credits. Set `ANTHROPIC_API_KEY` separately.
+Content generation uses free models only (Ollama on the server by default), so no AI API key is needed.
 
 ## Several accounts per platform
 

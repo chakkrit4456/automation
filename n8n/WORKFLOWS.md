@@ -20,7 +20,7 @@ POST `/api/jobs/generation`
 
 Steps:
 1. Load content
-2. Call Claude through backend
+2. Call the free AI model (Ollama) through backend
 3. Validate JSON
 4. Generate TTS
 5. Build subtitles

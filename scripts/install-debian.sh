@@ -1,22 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "AI Social Automation - Debian bootstrap"
-echo "Review this script before production use."
-
-sudo apt-get update
-sudo apt-get install -y ca-certificates curl git nginx ffmpeg postgresql-client
-
-# Docker installation should follow the current official Docker documentation
-# for the installed Debian release.
-
+# The supported installer is ../install.sh (native, no Docker, Debian 13 / 12).
+# This file remains for older docs that point here.
+echo "AI Social Automation - Debian installer"
+echo "Run as root from the project root instead:"
+echo "  bash install.sh"
 echo
-echo "Next:"
-echo "1. Install Docker Engine + Docker Compose plugin."
-echo "2. Copy .env.example to .env."
-echo "3. Generate strong PostgreSQL/app/n8n secrets."
-echo "4. Run: docker compose up -d postgres"
-echo "5. Apply: database/schema.sql"
-echo "6. Run: docker compose up -d app n8n"
-echo "7. Configure Nginx + HTTPS."
-echo "8. Configure OAuth apps and external AI/TTS providers."
+echo "It installs Node.js 24, PostgreSQL, FFmpeg, edge-tts, Ollama with a free AI model,"
+echo "n8n, Nginx and systemd services. See docs/14-ขึ้นใช้งานจริง.md."
+exec bash "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/install.sh" "$@"

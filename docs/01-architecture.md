@@ -14,7 +14,7 @@ Nginx
           |
           +--> Self-hosted PostgreSQL
           |
-          +--> Claude API
+          +--> Ollama (free local model, 127.0.0.1:11434)
           |
           +--> n8n webhook/API
           |
@@ -44,7 +44,7 @@ Self-hosted PostgreSQL
 The dashboard is the single management interface.
 
 It must never contain:
-- Claude API keys
+- AI provider keys (free tiers)
 - OAuth client secrets
 - Social access tokens
 - PostgreSQL credentials

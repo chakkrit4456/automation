@@ -34,4 +34,4 @@ if (args.has("--local")) {
 
 fs.writeFileSync(target, text, { mode: 0o600 });
 console.log(`Wrote ${target}`);
-console.log("Admin login: ADMIN_EMAIL / ADMIN_PASSWORD in .env. Add ANTHROPIC_API_KEY and OAuth credentials next.");
+console.log("Admin login: ADMIN_EMAIL / ADMIN_PASSWORD in .env. AI uses free models (AI_PROVIDER=ollama by default). Add OAuth credentials next.");

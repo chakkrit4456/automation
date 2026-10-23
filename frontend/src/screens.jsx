@@ -417,7 +417,7 @@ function Generator({ notify }) {
         </div>
         <div className="field"><label>บัญชีปลายทาง</label><AccountPicker platforms={form.platforms} value={form.account_ids} onChange={(ids) => set("account_ids", ids)} /></div>
         <button className="btn btn-primary" disabled={busy} onClick={generate}>{busy ? "กำลังสร้าง…" : "สร้าง"}</button>
-        <p className="hint">ไม่มีคีย์ API จะใช้ตัวสร้างจำลอง ไม่มีการเรียก Claude</p>
+        <p className="hint">ใช้โมเดล AI ฟรีเท่านั้น (ค่าเริ่มต้น Ollama บนเซิร์ฟเวอร์นี้) เลือกผู้ให้บริการได้ที่ ตั้งค่า → AI</p>
       </div>
       <div className="gen-out">
         {result && (
@@ -927,7 +927,7 @@ function Settings({ id, notify }) {
   if (!data) return <p className="hint">กำลังโหลด…</p>;
   const fields = {
     general: [["app_name", "ชื่อระบบ"], ["timezone", "เขตเวลา"], ["ui_language", "ภาษา UI"]],
-    ai: [["model", "โมเดล"], ["default_language", "ภาษาเริ่มต้น"], ["default_tone", "โทนเริ่มต้น"], ["monthly_budget_usd", "งบประมาณต่อเดือน (USD)"]],
+    ai: [["model", "โมเดล"], ["default_language", "ภาษาเริ่มต้น"], ["default_tone", "โทนเริ่มต้น"]],
     video: [["width", "กว้าง"], ["height", "สูง"], ["fps", "FPS"], ["subtitle_mode", "ซับไตเติล"]],
     storage: [["media_root", "โฟลเดอร์"], ["max_video_size_mb", "ขนาดไฟล์สูงสุด (MB)"]],
     notifications: [["daily_digest_time", "สรุปรายวัน"]],
@@ -944,9 +944,19 @@ function Settings({ id, notify }) {
       </div>
       <div>
         <h1 className="page-title">{SETTING_NAV.find(([key]) => key === section)?.[1]}</h1>
-        {section === "ai" && <p className="hint">คีย์ Anthropic แยกจากบัญชี Claude Pro ระบบไม่แสดงคีย์ที่บันทึกไว้ สถานะ: {data.ai?.api_key_set ? "ตั้งแล้ว" : "ยังไม่ตั้ง"}</p>}
+        {section === "ai" && <p className="hint">ใช้เฉพาะโมเดลฟรี: Ollama รันบนเซิร์ฟเวอร์นี้ ไม่ต้องใช้คีย์และไม่มีค่าใช้จ่าย ส่วน Groq / Gemini / OpenRouter ใช้ free tier (ต้องมีคีย์ฟรี และ OpenRouter ต้องเป็นโมเดลที่ลงท้าย :free)</p>}
         {section === "ai" && (
-          <div className="field"><label>Anthropic API key</label><input className="input" type="password" placeholder="วางคีย์ใหม่ถ้าต้องการเปลี่ยน" value={form.api_key || ""} onChange={(event) => setForm({ ...form, api_key: event.target.value })} /></div>
+          <div className="field"><label>ผู้ให้บริการ</label>
+            <select className="input" value={form.provider || ""} onChange={(event) => {
+              const next = (data.ai?.providers || []).find((item) => item.id === event.target.value);
+              setForm({ ...form, provider: event.target.value, model: next?.model || "" });
+            }}>
+              {(data.ai?.providers || []).map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+            </select>
+          </div>
+        )}
+        {section === "ai" && (data.ai?.providers || []).find((item) => item.id === form.provider)?.needs_key && (
+          <div className="field"><label>API key (free tier)</label><input className="input" type="password" placeholder={data.ai?.api_key_set && data.ai?.provider === form.provider ? "ตั้งแล้ว — วางคีย์ใหม่ถ้าต้องการเปลี่ยน" : "วางคีย์ฟรีของผู้ให้บริการนี้"} value={form.api_key || ""} onChange={(event) => setForm({ ...form, api_key: event.target.value })} /></div>
         )}
         {section === "security" && <p className="hint">โทเคนถูกเข้ารหัสด้วย APP_SECRET ก่อนเก็บใน PostgreSQL รหัสผ่านผู้ดูแลถูกแฮชด้วย scrypt</p>}
         {section === "social" && <p className="hint">ตั้งค่า OAuth client ที่ฝั่งเซิร์ฟเวอร์ผ่านตัวแปรสภาพแวดล้อม ไม่เก็บความลับในหน้าเว็บ</p>}
@@ -965,7 +975,7 @@ function Settings({ id, notify }) {
               await api.saveSettings(section, patch);
               reload();
             } catch (error) { notify(error); } }}>บันทึก</button>
-            {section === "ai" && <button className="btn btn-secondary" onClick={async () => { try { await api.testAi(); } catch (error) { notify(error); } }}>ทดสอบการเชื่อมต่อ</button>}
+            {section === "ai" && <button className="btn btn-secondary" onClick={async () => { try { const result = await api.testAi(); notify({ message: result.note }); } catch (error) { notify(error); } }}>ทดสอบการเชื่อมต่อ</button>}
           </div>
         )}
       </div>

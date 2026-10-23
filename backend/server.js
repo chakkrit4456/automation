@@ -2,7 +2,7 @@ const path = require("path");
 const { MemoryStore, hashPassword } = require("./src/store-memory");
 const { PgStore, ensureSchema, createPool } = require("./src/store-pg");
 const { buildApp } = require("./src/app");
-const { seedDemo, decryptSecret, runAutomation } = require("./src/services");
+const { seedDemo, runAutomation, currentAi } = require("./src/services");
 
 async function main() {
   const config = loadConfig();
@@ -22,10 +22,8 @@ async function main() {
 
   await ensureAdmin(store, config);
   if (config.seedDemo) await seedDemo(store);
-  const settings = await store.getSettings();
-  if (!config.anthropicApiKey && settings.ai?.api_key_encrypted) {
-    config.anthropicApiKey = decryptSecret(settings.ai.api_key_encrypted, config.appSecret);
-  }
+  const ai = await currentAi(store, config);
+  console.log(`AI text model: ${ai.provider} ${ai.model}${ai.baseUrl ? ` (${ai.baseUrl})` : ""}`);
 
   const app = buildApp({ store, config, logger: config.nodeEnv !== "test" });
   app.addHook("onClose", async () => {
@@ -44,8 +42,7 @@ async function main() {
       try {
         await runAutomation(store, {
           publisherMode: config.publisherMode,
-          apiKey: config.anthropicApiKey,
-          model: config.anthropicModel,
+          ai: await currentAi(store, config),
           video: config.video,
           config,
         });
@@ -95,8 +92,14 @@ function loadConfig() {
         rate: process.env.TTS_RATE || "",
       },
     },
-    anthropicApiKey: process.env.ANTHROPIC_API_KEY || "",
-    anthropicModel: process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5",
+    // Free models only: ollama (local; production default), groq / gemini / openrouter free tiers, or mock (dev default).
+    ai: {
+      provider: process.env.AI_PROVIDER || (nodeEnv === "production" ? "ollama" : "mock"),
+      model: process.env.AI_MODEL || "",
+      baseUrl: process.env.AI_BASE_URL || "",
+      apiKey: process.env.AI_API_KEY || "",
+      timeoutMs: Number(process.env.AI_TIMEOUT_MS || 300_000),
+    },
     publisherMode: process.env.PUBLISHER_MODE || "mock",
     publicUrl: process.env.PUBLIC_URL || "http://localhost:3000",
     automationToken: process.env.AUTOMATION_TOKEN || "",

@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # =============================================================================
 #  AI Social Automation — ตัวติดตั้งแบบไม่ใช้ Docker
-#  สำหรับ: TurnKey Linux Node.js (debian-12-turnkey-nodejs_18.0-1) / Debian 12
+#  สำหรับ: Debian 13 (trixie) standard — รองรับ Debian 12 / TurnKey Node.js ด้วย
 #
 #  ติดตั้งให้ครบ: Node.js 24, PostgreSQL, FFmpeg + ฟอนต์ไทย, edge-tts,
-#  n8n, Nginx (reverse proxy), systemd services, HTTPS (ถ้าใส่โดเมน)
+#  Ollama + โมเดล AI ฟรี (รันบนเครื่องนี้ ไม่มีค่า API), n8n, Nginx (reverse proxy),
+#  systemd services, HTTPS (ถ้าใส่โดเมน)
 #
 #  วิธีใช้ (ในโฟลเดอร์โปรเจคบนเซิร์ฟเวอร์, รันด้วย root):
 #     bash install.sh
@@ -27,8 +28,14 @@
 #
 #     ALERT_WEBHOOK_URL  Discord/Slack webhook สำหรับแจ้งเตือนเมื่อแอปล่ม/สำรองข้อมูลล้มเหลว (ไม่ใส่ก็ได้)
 #     ENABLE_UFW    yes/no  เปิด firewall (ค่าเริ่มต้น yes; ข้ามเองถ้าหาพอร์ต SSH ไม่เจอ)
-#     SWAP_MB       ขนาด swap ที่จะสร้างถ้าเครื่อง RAM <= 3GB และยังไม่มี swap (ค่าเริ่มต้น 2048)
+#     SWAP_MB       ขนาด swap ที่จะสร้างถ้ายังไม่มี swap และ RAM <= 8 GB (มี Ollama) / 3 GB (ค่าเริ่มต้น 4096)
 #     BACKUP_MEDIA  yes = สำรองโฟลเดอร์วิดีโอด้วย (ค่าเริ่มต้น no เพราะไฟล์ใหญ่)
+#
+#     AI (ฟรี 100%):
+#     AI_PROVIDER   ollama (ค่าเริ่มต้น, รันบนเครื่องนี้) | groq | gemini | openrouter (free tier, ต้องมีคีย์ฟรี) | mock
+#     AI_MODEL      ชื่อโมเดล (ไม่ใส่ = เลือกตาม RAM: < 6 GB → qwen2.5:1.5b, ไม่งั้น gemma3:4b)
+#     AI_API_KEY    คีย์ฟรีของ groq / gemini / openrouter (ollama ไม่ต้องใช้)
+#     INSTALL_OLLAMA yes/no  (ค่าเริ่มต้น yes เมื่อ AI_PROVIDER=ollama)
 #
 #  ตัวอย่าง Cloudflare Tunnel:
 #     bash install.sh                      # ใช้ค่าเริ่มต้น (automation.itdev.in.th) ไม่ต้องมี token
@@ -56,8 +63,12 @@ CF_TUNNEL="${CF_TUNNEL:-$([[ -n "$CF_TUNNEL_TOKEN" ]] && echo yes || { [[ -n "$L
 BEHIND_CF=$([[ "$CF_TUNNEL" == yes || "$CF_TUNNEL" == existing ]] && echo yes || echo no)
 ALERT_WEBHOOK_URL="${ALERT_WEBHOOK_URL:-}"
 ENABLE_UFW="${ENABLE_UFW:-yes}"
-SWAP_MB="${SWAP_MB:-2048}"
+SWAP_MB="${SWAP_MB:-4096}"
 BACKUP_MEDIA="${BACKUP_MEDIA:-no}"
+AI_PROVIDER_IN="${AI_PROVIDER:-}"
+AI_MODEL_IN="${AI_MODEL:-}"
+AI_API_KEY_IN="${AI_API_KEY:-}"
+INSTALL_OLLAMA="${INSTALL_OLLAMA:-}"
 NODE_MAJOR=24   # n8n 2.x ต้องการ Node >= 24 (backend ต้องการ >= 22.9)
 DB_NAME="ai_social"
 DB_USER="ai_social"
@@ -95,7 +106,10 @@ env_secret() {
 [[ -f "$SRC_DIR/backend/server.js" && -f "$SRC_DIR/database/schema.sql" ]] \
   || die "ให้วาง install.sh ไว้ที่โฟลเดอร์รากของโปรเจค (ที่มี backend/ frontend/ database/)"
 . /etc/os-release
-[[ "${VERSION_CODENAME:-}" == "bookworm" ]] || warn "ออกแบบสำหรับ Debian 12 (bookworm) แต่พบ ${PRETTY_NAME:-unknown}"
+case "${VERSION_CODENAME:-}" in
+  trixie|bookworm) ;;
+  *) warn "ออกแบบสำหรับ Debian 13 (trixie) / Debian 12 (bookworm) แต่พบ ${PRETTY_NAME:-unknown}" ;;
+esac
 exec > >(tee -a "$LOG_FILE") 2>&1
 export DEBIAN_FRONTEND=noninteractive
 
@@ -106,10 +120,10 @@ echo " Target : $APP_DIR"
 echo " Domain : ${DOMAIN:-<ใช้ IP>}   n8n: ${N8N_DOMAIN:-<localhost only>}"
 echo "============================================================"
 
-# n8n อย่างเดียวใช้ราว 3 GB — ถ้าดิสก์เต็ม npm จะล้มกลางทาง (ENOSPC)
+# n8n ใช้ราว 3 GB และโมเดล AI อีก 1-4 GB — ถ้าดิสก์เต็ม npm/ollama จะล้มกลางทาง (ENOSPC)
 free_mb="$(df -Pm / | awk 'NR==2{print $4}')"
-if [[ "$free_mb" -lt 3072 ]]; then
-  warn "พื้นที่ดิสก์ว่างเหลือ ${free_mb} MB (แนะนำ >= 3 GB) — ล้าง cache ให้ก่อน"
+if [[ "$free_mb" -lt 8192 ]]; then
+  warn "พื้นที่ดิสก์ว่างเหลือ ${free_mb} MB (แนะนำ >= 8 GB) — ล้าง cache ให้ก่อน"
   apt-get clean || true
   npm cache clean --force >/dev/null 2>&1 || true
   journalctl --vacuum-size=100M >/dev/null 2>&1 || true
@@ -118,11 +132,12 @@ if [[ "$free_mb" -lt 3072 ]]; then
 fi
 
 # ---------- 1. แพ็กเกจระบบ ----------
-step "1/10 ติดตั้งแพ็กเกจระบบ"
+step "1/11 ติดตั้งแพ็กเกจระบบ"
 apt-get update -y
 apt-get install -y --no-install-recommends \
   ca-certificates curl gnupg openssl rsync git build-essential \
-  nginx postgresql postgresql-contrib \
+  iproute2 procps zstd pciutils \
+  nginx postgresql \
   ffmpeg fonts-noto-core fonts-thai-tlwg fontconfig \
   python3 python3-venv python3-pip \
   certbot python3-certbot-nginx
@@ -130,7 +145,7 @@ fc-cache -f >/dev/null || true
 ok "แพ็กเกจระบบพร้อม"
 
 # ---------- 2. Node.js 24 (TurnKey มาพร้อม 18; backend ต้องการ >=22.9, n8n 2.x ต้องการ >=24) ----------
-step "2/10 ติดตั้ง Node.js ${NODE_MAJOR}"
+step "2/11 ติดตั้ง Node.js ${NODE_MAJOR}"
 cur_major="$(node -v 2>/dev/null | sed -E 's/^v([0-9]+).*/\1/' || echo 0)"
 if [[ "${cur_major:-0}" -lt "$NODE_MAJOR" ]]; then
   warn "พบ Node $(node -v 2>/dev/null || echo 'none') — อัปเกรดเป็น ${NODE_MAJOR}.x จาก NodeSource"
@@ -154,7 +169,7 @@ node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a
 ok "Node $(node -v), npm $(npm -v)"
 
 # ---------- 3. ผู้ใช้ระบบ + คัดลอกโค้ด ----------
-step "3/10 สร้างผู้ใช้ '$APP_USER' และคัดลอกโค้ดไป $APP_DIR"
+step "3/11 สร้างผู้ใช้ '$APP_USER' และคัดลอกโค้ดไป $APP_DIR"
 id "$APP_USER" &>/dev/null || useradd --system --create-home --home-dir "/home/$APP_USER" --shell /usr/sbin/nologin "$APP_USER"
 install -d -o "$APP_USER" -g "$APP_USER" "$APP_DIR" /var/lib/$APP_NAME/media
 if [[ "$SRC_DIR" != "$APP_DIR" ]]; then
@@ -167,7 +182,7 @@ chown -R "$APP_USER:$APP_USER" "$APP_DIR"
 ok "โค้ดอยู่ที่ $APP_DIR"
 
 # ---------- 4. edge-tts (Python venv) ----------
-step "4/10 ติดตั้ง edge-tts (เสียงพากย์ไทยฟรี)"
+step "4/11 ติดตั้ง edge-tts (เสียงพากย์ไทยฟรี)"
 if [[ ! -x "$APP_DIR/.venv/bin/edge-tts" ]]; then
   runuser -u "$APP_USER" -- python3 -m venv "$APP_DIR/.venv"
 fi
@@ -175,8 +190,47 @@ runuser -u "$APP_USER" -- "$APP_DIR/.venv/bin/pip" install --quiet --upgrade pip
 ln -sf "$APP_DIR/.venv/bin/edge-tts" /usr/local/bin/edge-tts
 ok "edge-tts $("$APP_DIR/.venv/bin/edge-tts" --version 2>/dev/null | head -1 || echo installed)"
 
-# ---------- 5. ไฟล์ .env ----------
-step "5/10 เตรียมไฟล์ .env"
+# ---------- 5. AI ฟรี: Ollama + โมเดล open-weight (ไม่มีค่า API) ----------
+mem_kb="$(awk '/MemTotal/ {print $2}' /proc/meminfo)"
+# ค่าใน .env เดิมมาก่อนค่า default (รันซ้ำเพื่ออัปเดตจะไม่เปลี่ยนโมเดลเอง)
+AI_PROVIDER="${AI_PROVIDER_IN:-$(env_get AI_PROVIDER || true)}"; AI_PROVIDER="${AI_PROVIDER:-ollama}"
+AI_MODEL="${AI_MODEL_IN:-$(env_get AI_MODEL || true)}"
+if [[ -z "$AI_MODEL" && "$AI_PROVIDER" == ollama ]]; then
+  if [[ "$mem_kb" -lt 6291456 ]]; then AI_MODEL="qwen2.5:1.5b"; else AI_MODEL="gemma3:4b"; fi
+fi
+INSTALL_OLLAMA="${INSTALL_OLLAMA:-$([[ "$AI_PROVIDER" == ollama ]] && echo yes || echo no)}"
+step "5/11 ติดตั้ง AI ฟรี (${AI_PROVIDER}${AI_MODEL:+ / $AI_MODEL})"
+if [[ "$INSTALL_OLLAMA" == yes ]]; then
+  if ! command -v ollama >/dev/null; then
+    # ตัวติดตั้งทางการของ Ollama: สร้างผู้ใช้ ollama + systemd service และตรวจ GPU ให้เอง
+    curl -fsSL https://ollama.com/install.sh -o /tmp/ollama-install.sh
+    sh /tmp/ollama-install.sh
+    rm -f /tmp/ollama-install.sh
+  fi
+  # ฟังเฉพาะ localhost, โหลดโมเดลทีละตัว (เครื่องเล็ก), context พอสำหรับหลายไอเดียต่อครั้ง
+  install -d /etc/systemd/system/ollama.service.d
+  cat > /etc/systemd/system/ollama.service.d/ai-social.conf <<EOF
+[Service]
+Environment=OLLAMA_HOST=127.0.0.1:11434
+Environment=OLLAMA_NUM_PARALLEL=1
+Environment=OLLAMA_MAX_LOADED_MODELS=1
+Environment=OLLAMA_KEEP_ALIVE=10m
+Environment=OLLAMA_CONTEXT_LENGTH=8192
+EOF
+  systemctl daemon-reload
+  systemctl enable ollama >/dev/null 2>&1 || true
+  systemctl restart ollama
+  for i in {1..30}; do curl -fsS http://127.0.0.1:11434/api/version >/dev/null 2>&1 && break; sleep 1; done
+  curl -fsS http://127.0.0.1:11434/api/version >/dev/null || die "Ollama ไม่ตอบที่ 127.0.0.1:11434 — ดู: journalctl -u ollama -n 50"
+  echo "  ดาวน์โหลดโมเดล ${AI_MODEL} (ครั้งแรกใช้เวลาหลายนาที)"
+  OLLAMA_HOST=127.0.0.1:11434 ollama pull "$AI_MODEL" || die "ดาวน์โหลดโมเดล ${AI_MODEL} ไม่สำเร็จ — ตรวจอินเทอร์เน็ต/ดิสก์ แล้วรันซ้ำ"
+  ok "Ollama $(ollama --version 2>/dev/null | awk '{print $NF}') + ${AI_MODEL} พร้อม (127.0.0.1:11434)"
+else
+  ok "ไม่ติดตั้ง Ollama (AI_PROVIDER=${AI_PROVIDER})"
+fi
+
+# ---------- 6. ไฟล์ .env ----------
+step "6/11 เตรียมไฟล์ .env"
 FRESH_ENV=0
 if [[ ! -f "$ENV_FILE" ]]; then
   FRESH_ENV=1
@@ -188,8 +242,18 @@ if [[ ! -f "$ENV_FILE" ]]; then
   sed -i 's/\r$//' "$ENV_FILE"   # กันไฟล์ที่มาจาก Windows (CRLF)
 fi
 for k in APP_SECRET ADMIN_PASSWORD AUTOMATION_TOKEN POSTGRES_PASSWORD N8N_ENCRYPTION_KEY; do env_secret "$k"; done
+# ใช้แต่โมเดล AI ฟรี: ลบคีย์ Claude (เสียเงิน) ที่อาจค้างจาก .env เดิม
+sed -i -e '/^ANTHROPIC_API_KEY=/d' -e '/^ANTHROPIC_MODEL=/d' -e '/^# Claude API/d' "$ENV_FILE"
+env_set AI_PROVIDER "$AI_PROVIDER"
+env_set AI_MODEL "$AI_MODEL"
+[[ "$AI_PROVIDER" == ollama ]] && env_set AI_BASE_URL "http://127.0.0.1:11434"
+[[ -n "$AI_API_KEY_IN" ]] && env_set AI_API_KEY "$AI_API_KEY_IN"
+if [[ "$AI_PROVIDER" =~ ^(groq|gemini|openrouter)$ && -z "$(env_get AI_API_KEY)" ]]; then
+  warn "AI_PROVIDER=${AI_PROVIDER} ต้องมีคีย์ฟรี: ใส่ AI_API_KEY ใน ${ENV_FILE} หรือในหน้า ตั้งค่า → AI"
+fi
 
-SERVER_IP="$(hostname -I | awk '{print $1}')"
+SERVER_IP="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<NF;i++) if($i=="src"){print $(i+1); exit}}')"
+[[ -n "$SERVER_IP" ]] || SERVER_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
 if [[ -n "$DOMAIN" ]]; then
   if [[ "$BEHIND_CF" == yes || -n "$LE_EMAIL" ]]; then PUBLIC_URL="https://$DOMAIN"; else PUBLIC_URL="http://$DOMAIN"; fi
 else
@@ -216,8 +280,8 @@ env_set STATIC_DIR "$APP_DIR/frontend/dist"
 chown "$APP_USER:$APP_USER" "$ENV_FILE"; chmod 600 "$ENV_FILE"
 ok ".env พร้อม (PUBLIC_URL=$PUBLIC_URL)"
 
-# ---------- 6. PostgreSQL ----------
-step "6/10 ตั้งค่า PostgreSQL"
+# ---------- 7. PostgreSQL ----------
+step "7/11 ตั้งค่า PostgreSQL"
 systemctl enable --now postgresql
 cd /   # ให้ผู้ใช้ postgres ไม่เตือน "could not change directory"
 for i in {1..20}; do runuser -u postgres -- pg_isready -q && break; sleep 1; done
@@ -240,8 +304,8 @@ GRANT ALL ON SCHEMA public TO ${DB_USER};
 SQL
 ok "ฐานข้อมูล ${DB_NAME} พร้อม (ตาราง/ migration จะสร้างอัตโนมัติตอนแอปเริ่ม)"
 
-# ---------- 7. build แอป ----------
-step "7/10 ติดตั้ง dependencies และ build frontend"
+# ---------- 8. build แอป ----------
+step "8/11 ติดตั้ง dependencies และ build frontend"
 cd "$APP_DIR/frontend"
 runuser -u "$APP_USER" -- npm ci --no-audit --no-fund
 runuser -u "$APP_USER" -- npm run build
@@ -249,13 +313,14 @@ cd "$APP_DIR/backend"
 runuser -u "$APP_USER" -- npm ci --omit=dev --no-audit --no-fund
 ok "build สำเร็จ"
 
-# ---------- 8. systemd services ----------
-step "8/10 สร้าง systemd services"
+# ---------- 9. systemd services ----------
+step "9/11 สร้าง systemd services"
+OLLAMA_UNIT=$([[ "$INSTALL_OLLAMA" == yes ]] && echo " ollama.service" || true)
 cat > /etc/systemd/system/${APP_NAME}.service <<EOF
 [Unit]
 Description=AI Social Automation (API + Dashboard)
-After=network-online.target postgresql.service
-Wants=network-online.target
+After=network-online.target postgresql.service${OLLAMA_UNIT}
+Wants=network-online.target${OLLAMA_UNIT}
 Requires=postgresql.service
 
 [Service]
@@ -370,8 +435,8 @@ if [[ "$INSTALL_N8N" == "yes" ]]; then
   done
 fi
 
-# ---------- 9. Nginx + HTTPS ----------
-step "9/10 ตั้งค่า Nginx"
+# ---------- 10. Nginx + HTTPS ----------
+step "10/11 ตั้งค่า Nginx"
 # ปิด site เดิมของ TurnKey (สำรองไว้ใน /etc/nginx/sites-disabled-turnkey)
 install -d /etc/nginx/sites-disabled-turnkey
 for f in /etc/nginx/sites-enabled/*; do
@@ -448,8 +513,9 @@ if [[ "$CF_TUNNEL" == existing ]]; then
 elif [[ "$CF_TUNNEL" == yes ]]; then
   step "   Cloudflare Tunnel"
   if ! command -v cloudflared >/dev/null; then
-    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg -o /usr/share/keyrings/cloudflare-main.gpg
-    echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared bookworm main" \
+    curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v2.gpg -o /usr/share/keyrings/cloudflare-public-v2.gpg
+    # "any" ใช้ได้ทั้ง Debian 12 และ 13
+    echo "deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main" \
       > /etc/apt/sources.list.d/cloudflared.list
     apt-get update -y && apt-get install -y cloudflared
   fi
@@ -522,12 +588,12 @@ elif [[ -n "$DOMAIN" && -n "$LE_EMAIL" ]]; then
   fi
 fi
 
-# ---------- 10. ความปลอดภัย + การดูแลระบบ (swap, firewall, สำรองข้อมูล, เฝ้าระวัง) ----------
-step "10/10 swap, firewall, สำรองข้อมูล, ตรวจสุขภาพระบบ"
+# ---------- 11. ความปลอดภัย + การดูแลระบบ (swap, firewall, สำรองข้อมูล, เฝ้าระวัง) ----------
+step "11/11 swap, firewall, สำรองข้อมูล, ตรวจสุขภาพระบบ"
 
-# 10.1 swap (เครื่อง 2 GB: FFmpeg + PostgreSQL + n8n พร้อมกันเสี่ยง OOM)
-mem_kb="$(awk '/MemTotal/ {print $2}' /proc/meminfo)"
-if [[ -z "$(swapon --show --noheadings 2>/dev/null)" && "$mem_kb" -le 3145728 ]]; then
+# 11.1 swap (FFmpeg + PostgreSQL + n8n + โมเดล AI พร้อมกันเสี่ยง OOM บนเครื่อง RAM น้อย)
+SWAP_LIMIT_KB=$([[ "$INSTALL_OLLAMA" == yes ]] && echo 8388608 || echo 3145728)
+if [[ -z "$(swapon --show --noheadings 2>/dev/null)" && "$mem_kb" -le "$SWAP_LIMIT_KB" ]]; then
   if { fallocate -l "${SWAP_MB}M" /swapfile || dd if=/dev/zero of=/swapfile bs=1M count="$SWAP_MB" status=none; } \
      && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile; then
     grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
@@ -540,7 +606,7 @@ else
   ok "swap: $(swapon --show --noheadings 2>/dev/null | awk '{print $3}' | paste -sd, - || true) (ไม่ต้องสร้างเพิ่ม)"
 fi
 
-# 10.2 จำกัดขนาด log
+# 11.2 จำกัดขนาด log
 install -d /etc/systemd/journald.conf.d
 printf '[Journal]\nSystemMaxUse=300M\nMaxRetentionSec=1month\n' > /etc/systemd/journald.conf.d/ai-social.conf
 systemctl restart systemd-journald 2>/dev/null || true
@@ -555,7 +621,7 @@ ${LOG_FILE} {
 EOF
 ok "จำกัด journal 300 MB และหมุน log ติดตั้ง"
 
-# 10.3 firewall + fail2ban
+# 11.3 firewall + fail2ban
 if [[ "$ENABLE_UFW" == yes ]]; then
   SSH_PORT="$(ss -tlnp 2>/dev/null | awk '/sshd/ {n=split($4,a,":"); print a[n]; exit}')"
   if [[ -z "$SSH_PORT" ]]; then
@@ -582,7 +648,7 @@ if [[ "$ENABLE_UFW" == yes ]]; then
   fi
 fi
 
-# 10.4 แจ้งเตือน (webhook แบบ Discord/Slack) — ไม่ใส่ URL ก็ไม่ส่ง
+# 11.4 แจ้งเตือน (webhook แบบ Discord/Slack) — ไม่ใส่ URL ก็ไม่ส่ง
 umask 077
 [[ -f /etc/${APP_NAME}-alert.env ]] || echo "ALERT_WEBHOOK_URL=" > /etc/${APP_NAME}-alert.env
 [[ -n "$ALERT_WEBHOOK_URL" ]] && sed -i "s|^ALERT_WEBHOOK_URL=.*|ALERT_WEBHOOK_URL=${ALERT_WEBHOOK_URL//|/\\|}|" /etc/${APP_NAME}-alert.env
@@ -600,7 +666,7 @@ curl -fsS -m 10 -H 'Content-Type: application/json' -d "{\"content\":\"$json\",\
 EOF
 chmod 755 /usr/local/sbin/${APP_NAME}-alert
 
-# 10.5 สำรองข้อมูลทุกวัน (ฐานข้อมูล + .env) เก็บ 14 วัน
+# 11.5 สำรองข้อมูลทุกวัน (ฐานข้อมูล + .env) เก็บ 14 วัน
 cat > /usr/local/sbin/${APP_NAME}-backup <<EOF
 #!/usr/bin/env bash
 set -Eeuo pipefail
@@ -633,7 +699,7 @@ Persistent=true
 WantedBy=timers.target
 EOF
 
-# 10.6 ตรวจสุขภาพทุก 5 นาที: ล่ม 2 ครั้งติด -> รีสตาร์ท + แจ้งเตือน, ดิสก์เกิน 85% -> แจ้งเตือน
+# 11.6 ตรวจสุขภาพทุก 5 นาที: ล่ม 2 ครั้งติด -> รีสตาร์ท + แจ้งเตือน, ดิสก์เกิน 85% -> แจ้งเตือน
 cat > /usr/local/sbin/${APP_NAME}-healthcheck <<EOF
 #!/usr/bin/env bash
 set -u
@@ -686,7 +752,8 @@ cat <<EOF
  Admin password: $(env_get ADMIN_PASSWORD)
  n8n           : $( [[ "$INSTALL_N8N" != yes ]] && echo "ไม่ได้ติดตั้ง" || { [[ -n "$N8N_DOMAIN" ]] && echo "${N8N_BASE}" || echo "127.0.0.1:${N8N_PORT} (ssh -L ${N8N_PORT}:127.0.0.1:${N8N_PORT} root@${SERVER_IP})"; } )
 
- ไฟล์ตั้งค่า    : ${ENV_FILE}   (ใส่ ANTHROPIC_API_KEY / OAuth keys ที่นี่)
+ AI (ฟรี)       : ${AI_PROVIDER} ${AI_MODEL}$([[ "$INSTALL_OLLAMA" == yes ]] && echo "  (Ollama บนเครื่องนี้ ไม่มีค่า API)")
+ ไฟล์ตั้งค่า    : ${ENV_FILE}   (ใส่ OAuth keys ที่นี่ / เปลี่ยนโมเดล: แก้ AI_MODEL แล้ว ollama pull <model>)
  วิดีโอ/สื่อ     : /var/lib/${APP_NAME}/media
  Log ติดตั้ง    : ${LOG_FILE}
 
@@ -695,6 +762,8 @@ cat <<EOF
    journalctl -u ${APP_NAME} -f         # ดู log แอปแบบสด
    systemctl restart ${APP_NAME}        # รีสตาร์ทหลังแก้ .env
    journalctl -u n8n -f                 # ดู log n8n
+   journalctl -u ollama -f              # ดู log โมเดล AI
+   ollama list                          # โมเดลที่ดาวน์โหลดไว้
    bash install.sh                      # รันซ้ำเพื่ออัปเดตโค้ด
 
  สำรองข้อมูล   : /var/backups/${APP_NAME}  (ทุกวัน 03:30, เก็บ 14 วัน)  สั่งเองด้วย: ${APP_NAME}-backup

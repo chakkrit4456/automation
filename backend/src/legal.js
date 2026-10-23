@@ -60,7 +60,7 @@ function privacyPage(config) {
 
 <h2>Service providers</h2>
 <ul>
-<li><strong>Anthropic (Claude API)</strong> receives the topic and settings you enter, to draft scripts and captions.</li>
+<li><strong>AI text model</strong>: scripts and captions are drafted by an open model running on the operator's own server (Ollama). If the operator switches to a free hosted model (Groq, Google Gemini or OpenRouter), that provider receives the topic and settings you enter.</li>
 <li><strong>Microsoft Edge text-to-speech</strong> receives the narration text, to produce the voice-over.</li>
 <li><strong>YouTube, Meta (Facebook/Instagram) and TikTok</strong> receive the video and caption when you publish, through their official APIs.</li>
 </ul>

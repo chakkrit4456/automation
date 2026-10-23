@@ -2,11 +2,23 @@
 
 ## Target
 
-Debian server:
-- 2 GB RAM
-- 1 vCPU
-- no local LLM
-- Docker available
+Debian 13 (trixie) standard server (Debian 12 also works):
+- 8 GB RAM recommended (4 GB works with the `qwen2.5:1.5b` model)
+- 2 vCPU, no GPU needed
+- 20 GB disk
+- free AI only: Ollama runs an open-weight model locally on `127.0.0.1:11434`
+
+The supported path is the native installer, which needs no Docker:
+
+```bash
+apt update && apt install -y git
+git clone https://github.com/chakkrit4456/automation.git && cd automation
+bash install.sh
+```
+
+It installs Node.js 24, PostgreSQL 17, FFmpeg, Thai fonts, edge-tts, Ollama plus a free model, n8n, Nginx, systemd units, swap, ufw, fail2ban, backups and a health check. Details: `docs/14-ขึ้นใช้งานจริง.md`.
+
+The Docker steps below are the alternative.
 
 ## Recommended layout
 
@@ -48,7 +60,8 @@ docker compose logs postgres
 # Apply application schema.
 docker compose exec -T postgres   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"   < database/schema.sql
 
-docker compose up -d app n8n
+docker compose up -d ollama app n8n
+docker compose exec ollama ollama pull gemma3:4b   # free model, once
 docker compose ps
 ```
 
@@ -70,12 +83,12 @@ If using the compose file exactly as supplied, `DATABASE_URL` should point to th
 
 ## Memory policy
 
-Because RAM is only 2 GB:
+On an 8 GB server:
+- Ollama with `gemma3:4b`: approximately 4 GB while a request runs, unloaded after 10 idle minutes
 - PostgreSQL memory limit: approximately 450 MB
 - n8n memory limit: approximately 650 MB
 - backend memory limit: approximately 350 MB
-- one FFmpeg job at a time
-- no local LLM
+- one FFmpeg job and one AI request at a time
 - no Redis initially
 - no Kubernetes
 

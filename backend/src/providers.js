@@ -36,9 +36,48 @@ function mockConcept(input, index) {
   });
 }
 
+// Free text models only. "ollama" runs on this server (no key, no cost). The others are
+// free tiers of hosted APIs and need a free key; OpenRouter is limited to its ":free" models.
+const AI_PRESETS = {
+  ollama: { label: "Ollama (local)", baseUrl: "http://127.0.0.1:11434", model: "gemma3:4b", needsKey: false },
+  groq: { label: "Groq free tier", baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile", needsKey: true, jsonMode: true },
+  gemini: { label: "Google Gemini free tier", baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-2.5-flash", needsKey: true, jsonMode: true },
+  openrouter: { label: "OpenRouter free models", baseUrl: "https://openrouter.ai/api/v1", model: "meta-llama/llama-3.3-70b-instruct:free", needsKey: true },
+  mock: { label: "Mock (offline)", baseUrl: "", model: "mock", needsKey: false },
+};
+
+// Combine the server .env (config.ai) with the dashboard AI settings into one call target.
+// apiKey is the key saved from the dashboard (already decrypted), used when .env has none.
+function resolveAi(config, settings = {}, savedKey = "") {
+  const env = config?.ai || {};
+  const envProvider = AI_PRESETS[env.provider] ? env.provider : "mock";
+  const provider = AI_PRESETS[settings.provider] ? settings.provider : envProvider;
+  const preset = AI_PRESETS[provider];
+  const sameAsEnv = provider === envProvider;
+  // Older installs stored a Claude model name in settings; it means nothing to a free provider.
+  const savedModel = settings.model && !/^claude/i.test(settings.model) ? settings.model : "";
+  return {
+    provider,
+    model: savedModel || (sameAsEnv && env.model) || preset.model,
+    baseUrl: ((sameAsEnv && env.baseUrl) || preset.baseUrl).replace(/\/+$/, ""),
+    apiKey: (sameAsEnv && env.apiKey) || savedKey || "",
+    timeoutMs: Number(env.timeoutMs) || 300_000,
+  };
+}
+
+function assertFreeModel(ai) {
+  if (ai.provider === "openrouter" && !String(ai.model).endsWith(":free")) {
+    throw httpError(400, "MODEL_NOT_FREE", `OpenRouter model must end with ":free" (got ${ai.model})`);
+  }
+  if (AI_PRESETS[ai.provider]?.needsKey && !ai.apiKey) {
+    throw httpError(400, "NOT_CONFIGURED", `${AI_PRESETS[ai.provider].label} needs a free API key (AI_API_KEY)`);
+  }
+}
+
 async function generateConcepts(input, options) {
   const recent = options.recent || [];
-  if (!options.apiKey) {
+  const ai = options.ai || { provider: "mock" };
+  if (ai.provider === "mock" || !AI_PRESETS[ai.provider]) {
     return {
       provider: "mock",
       concepts: Array.from({ length: input.count }, (_, index) => mockConcept(input, index)),
@@ -59,37 +98,96 @@ CTA: ${input.cta || ""}
 Audience: ${input.target_audience || "general"}
 Recent content to avoid repeating:
 ${recentText || "(none)"}
-Return JSON only: {"concepts":[...]} with fields topic, hook, script, voice_script, visual_prompt, caption, hashtags, title, cta, shot_list.`;
+Return JSON only: {"concepts":[...]} with fields topic, hook, script, voice_script, visual_prompt, caption, hashtags (array of strings), title, cta, shot_list.`;
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": options.apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: options.model || "claude-sonnet-5-5",
-      max_tokens: 4000,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: user }],
-    }),
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const message = payload?.error?.message || "Claude API request failed";
-    throw httpError(502, "AI_UPSTREAM", message);
-  }
-  const text = (payload.content || []).map((block) => block.text || "").join("\n");
+  assertFreeModel(ai);
+  const text = await chat(ai, SYSTEM_PROMPT, user);
   const json = extractJson(text);
-  const concepts = Array.isArray(json) ? json : json.concepts;
+  const concepts = Array.isArray(json) ? json : json.concepts || (json.hook ? [json] : null);
   if (!Array.isArray(concepts) || !concepts.length) {
     throw httpError(502, "AI_INVALID", "Model did not return concepts");
   }
   return {
-    provider: "claude",
-    concepts: concepts.slice(0, input.count).map((item) => validateAiOutput(item)),
+    provider: `${ai.provider}:${ai.model}`,
+    concepts: concepts.slice(0, input.count).map((item) => validateAiOutput(normalizeConcept(item, input))),
   };
+}
+
+// Small local models sometimes return lists where strings are expected, or skip easy fields.
+function normalizeConcept(item, input) {
+  const out = { ...(item || {}) };
+  for (const key of ["script", "voice_script", "shot_list", "visual_prompt", "caption"]) {
+    if (Array.isArray(out[key])) out[key] = out[key].join(" ");
+  }
+  out.topic = out.topic || input.topic;
+  out.title = out.title || out.topic;
+  out.voice_script = out.voice_script || [out.hook, out.script].filter(Boolean).join(" ");
+  out.cta = out.cta || input.cta || out.caption;
+  return out;
+}
+
+async function chat(ai, system, user) {
+  const label = AI_PRESETS[ai.provider].label;
+  const messages = [
+    { role: "system", content: system },
+    { role: "user", content: user },
+  ];
+  // Ollama uses its native API so the context window and JSON mode can be set per request.
+  const request = ai.provider === "ollama"
+    ? {
+        url: `${ai.baseUrl}/api/chat`,
+        headers: {},
+        body: { model: ai.model, stream: false, format: "json", options: { temperature: 0.8, num_ctx: 8192 }, messages },
+      }
+    : {
+        url: `${ai.baseUrl}/chat/completions`,
+        headers: { authorization: `Bearer ${ai.apiKey}` },
+        body: {
+          model: ai.model,
+          temperature: 0.8,
+          max_tokens: 4000,
+          ...(AI_PRESETS[ai.provider].jsonMode ? { response_format: { type: "json_object" } } : {}),
+          messages,
+        },
+      };
+  const response = await fetch(request.url, {
+    method: "POST",
+    headers: { "content-type": "application/json", ...request.headers },
+    body: JSON.stringify(request.body),
+    signal: AbortSignal.timeout(ai.timeoutMs || 300_000),
+  }).catch((error) => {
+    const reason = error.name === "TimeoutError" ? "timed out" : error.message;
+    throw httpError(502, "AI_UPSTREAM", `Could not reach ${label} at ${ai.baseUrl}: ${reason}`);
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    if (ai.provider === "ollama" && response.status === 404) {
+      throw httpError(502, "AI_MODEL_MISSING", `Ollama model ${ai.model} is not pulled. Run: ollama pull ${ai.model}`);
+    }
+    const message = payload?.error?.message || payload?.error || `HTTP ${response.status}`;
+    throw httpError(502, "AI_UPSTREAM", `${label}: ${message}`);
+  }
+  return ai.provider === "ollama" ? payload.message?.content || "" : payload.choices?.[0]?.message?.content || "";
+}
+
+// Connection check behind the dashboard "test" button.
+async function testAi(ai) {
+  if (ai.provider === "mock") return { status: "ok", note: "Mock generator: no AI calls." };
+  assertFreeModel(ai);
+  const label = AI_PRESETS[ai.provider].label;
+  const url = ai.provider === "ollama" ? `${ai.baseUrl}/api/tags` : `${ai.baseUrl}/models`;
+  const headers = ai.apiKey ? { authorization: `Bearer ${ai.apiKey}` } : {};
+  const response = await fetch(url, { headers, signal: AbortSignal.timeout(15_000) }).catch(() => null);
+  if (!response) throw httpError(502, "AI_UPSTREAM", `Could not reach ${label} at ${ai.baseUrl}`);
+  if (response.status === 401 || response.status === 403) throw httpError(400, "AI_KEY_INVALID", `${label} rejected the API key`);
+  if (!response.ok) throw httpError(502, "AI_UPSTREAM", `${label} returned HTTP ${response.status}`);
+  if (ai.provider === "ollama") {
+    const names = ((await response.json().catch(() => ({}))).models || []).map((row) => row.name);
+    if (!names.includes(ai.model) && !names.includes(`${ai.model}:latest`)) {
+      throw httpError(400, "AI_MODEL_MISSING", `Ollama is running but ${ai.model} is not pulled. Run: ollama pull ${ai.model}`);
+    }
+  }
+  return { status: "ok", note: `${label} ready (${ai.model}). Free model, no paid API.` };
 }
 
 function extractJson(text) {
@@ -171,6 +269,9 @@ function publishDecision(account, mode) {
 
 module.exports = {
   SYSTEM_PROMPT,
+  AI_PRESETS,
+  resolveAi,
+  testAi,
   generateConcepts,
   generateVideo,
   publishDecision,

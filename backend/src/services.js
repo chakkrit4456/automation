@@ -13,7 +13,7 @@ const {
   shouldGenerateAhead,
   PLATFORMS,
 } = require("./domain");
-const { generateConcepts, generateVideo, publishDecision } = require("./providers");
+const { generateConcepts, generateVideo, publishDecision, resolveAi } = require("./providers");
 const { publishLive } = require("./publishers");
 const { refreshTokens } = require("./oauth");
 const compliance = require("./compliance");
@@ -38,6 +38,22 @@ function decryptSecret(payload, secret) {
   const decipher = createDecipheriv("aes-256-gcm", key, iv);
   decipher.setAuthTag(tag);
   return Buffer.concat([decipher.update(data), decipher.final()]).toString("utf8");
+}
+
+// The free AI model to call right now: .env defaults, overridden by the dashboard AI settings.
+// A key saved from the dashboard is only used for the provider it was saved for.
+async function currentAi(store, config) {
+  const ai = (await store.getSettings()).ai || {};
+  const provider = ai.provider || config?.ai?.provider;
+  let savedKey = "";
+  if (ai.api_key_encrypted && ai.api_key_provider === provider) {
+    try {
+      savedKey = decryptSecret(ai.api_key_encrypted, config.appSecret) || "";
+    } catch {
+      savedKey = "";
+    }
+  }
+  return resolveAi(config, ai, savedKey);
 }
 
 function publicAccount(account) {
@@ -162,8 +178,7 @@ async function createContent(store, input) {
 async function generateAndOptionallySave(store, input, options) {
   const rows = await store.listContent();
   const generated = await generateConcepts(input, {
-    apiKey: options.apiKey,
-    model: options.model,
+    ai: options.ai,
     recent: rows.map((row) => ({ topic: row.topic, hook: row.hook })),
   });
   const fresh = generated.concepts.filter((concept) => !isDuplicate(rows, concept.topic, concept.hook));
@@ -195,7 +210,7 @@ async function generateAndOptionallySave(store, input, options) {
     saved.push(row);
     await store.addLog({
       level: "INFO",
-      job: "claude",
+      job: "ai",
       content_id: row.id,
       request_id: randomUUID(),
       message: `${generated.provider} created concept #${row.public_no}`,
@@ -774,8 +789,7 @@ async function runAutomation(store, options) {
           account_ids: settings.account_ids || [],
         },
         {
-          apiKey: options.apiKey,
-          model: options.model,
+          ai: options.ai || (await currentAi(store, options.config)),
           save: true,
           queue: true,
           scheduledAt: publishAt.toISOString(),
@@ -950,7 +964,7 @@ async function seedDemo(store) {
     ["2026-09-30T09:01:02+07:00", "INFO", "publish", "5 วิธีออมเงินสำหรับมนุษย์เงินเดือน", "instagram", "Reel published"],
     ["2026-09-30T08:59:40+07:00", "INFO", "publish", "5 วิธีออมเงินสำหรับมนุษย์เงินเดือน", "tiktok", "Video published"],
     ["2026-09-30T06:40:11+07:00", "INFO", "ffmpeg", "เคล็ดลับนอนหลับให้ลึก", null, "Render done 45s 1080x1920"],
-    ["2026-09-30T06:12:47+07:00", "DEBUG", "claude", "เคล็ดลับนอนหลับให้ลึก", null, "Mock concept created"],
+    ["2026-09-30T06:12:47+07:00", "DEBUG", "ai", "เคล็ดลับนอนหลับให้ลึก", null, "Mock concept created"],
     ["2026-09-30T06:00:00+07:00", "INFO", "scheduler", null, null, "Daily run started"],
   ];
   for (const [createdAt, level, job, topic, platform, message] of logRows) {
@@ -979,6 +993,7 @@ async function seedDemo(store) {
 }
 
 module.exports = {
+  currentAi,
   encryptSecret,
   decryptSecret,
   publicAccount,

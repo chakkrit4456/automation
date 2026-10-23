@@ -28,7 +28,7 @@ function defaultAutomation() {
 function defaultSettings() {
   return {
     general: { app_name: "SOCIAL / AUTO", timezone: "Asia/Bangkok", ui_language: "th" },
-    ai: { model: "claude-sonnet-5-5", default_language: "th", default_tone: "friendly", monthly_budget_usd: 20, api_key_set: false },
+    ai: { default_language: "th", default_tone: "friendly", api_key_set: false },
     video: { width: 1080, height: 1920, fps: 30, subtitle_mode: "burn-in" },
     storage: { media_root: "/data/media", max_video_size_mb: 500 },
     social: {},
